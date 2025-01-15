@@ -5,16 +5,16 @@ metadata:
   name: {{ $.Values.name }}-svc
   namespace: {{ $.Values.namespace}}
   labels:
-    {{- range $key, $value := .labels }}
+    {{- range $key, $value := $.Values.backstageLabels }}
     {{ $key }}: {{ $value }}
-    {{- end }}
+    {{- end }}     
 spec:
   type: {{ .type }}
   ports:
     - port: {{ .port }}
       protocol: TCP
   selector:
-    {{- range $key, $value := .labels }}
+    {{- range $key, $value := $.Values.labels }}
     {{ $key }}: {{ $value }}
-    {{- end }}
+    {{- end }} 
 {{- end }}

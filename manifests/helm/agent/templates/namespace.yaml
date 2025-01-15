@@ -3,4 +3,6 @@ kind: Namespace
 metadata:
   name: {{ $.Values.namespace }}
   labels:
-    backstage.io/kubernetes-id: ${{values.component_id}}
+    {{- range $key, $value := $.Values.backstageLabels }}
+    {{ $key }}: {{ $value }}
+    {{- end }}

@@ -7,6 +7,8 @@ namespace: ${{values.namespace}}
 
 labels:
   app: agent-app
+
+backstageLabels:
   backstage.io/kubernetes-id: ${{values.component_id}}
 
 replicaCount: 1

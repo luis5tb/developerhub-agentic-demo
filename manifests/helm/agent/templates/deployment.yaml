@@ -7,6 +7,9 @@ metadata:
     {{- range $key, $value := $.Values.labels }}
     {{ $key }}: {{ $value }}
     {{- end }}
+    {{- range $key, $value := $.Values.backstageLabels }}
+    {{ $key }}: {{ $value }}
+    {{- end }}
     app.openshift.io/runtime: python
 spec:
   replicas: {{ $.Values.replicaCount }}
@@ -23,6 +26,9 @@ spec:
       {{- end }}
       labels:
         {{- range $key, $value := $.Values.labels }}
+        {{ $key }}: {{ $value }}
+        {{- end }}
+        {{- range $key, $value := $.Values.backstageLabels }}
         {{ $key }}: {{ $value }}
         {{- end }}
     spec:

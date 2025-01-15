@@ -20,5 +20,5 @@ s3:
 
 bucketSecret: ${{values.bucket}}
 
-labels:
+backstageLabels:
   backstage.io/kubernetes-id: ${{values.component_id}}

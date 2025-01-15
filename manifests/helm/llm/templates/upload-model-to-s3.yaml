@@ -4,7 +4,7 @@ metadata:
   name: upload-model-to-s3
   namespace: {{ $.Values.namespace }}
   labels:
-    {{- range $key, $value := .labels }}
+    {{- range $key, $value := $.Values.backstageLabels }}
     {{ $key }}: {{ $value }}
     {{- end }}
 spec:
@@ -12,7 +12,7 @@ spec:
   template:
     metadata:
       labels:
-        {{- range $key, $value := .labels }}
+        {{- range $key, $value := $.Values.backstageLabels }}
         {{ $key }}: {{ $value }}
         {{- end }}
     spec:

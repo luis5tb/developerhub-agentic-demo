@@ -5,7 +5,7 @@ metadata:
   name: {{ $.Values.name }}-route
   namespace: {{ $.Values.namespace}}
   labels:
-    {{- range $key, $value := .labels }}
+    {{- range $key, $value := $.Values.backstageLabels }}
     {{ $key }}: {{ $value }}
     {{- end }}
 spec:
