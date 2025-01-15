@@ -19,3 +19,6 @@ s3:
   default_region: none
 
 bucketSecret: ${{values.bucket}}
+
+labels:
+  backstage.io/kubernetes-id: ${{values.component_id}}

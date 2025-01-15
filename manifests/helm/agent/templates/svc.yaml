@@ -4,6 +4,10 @@ kind: Service
 metadata:
   name: {{ $.Values.name }}-svc
   namespace: {{ $.Values.namespace}}
+  labels:
+    {{- range $key, $value := .labels }}
+    {{ $key }}: {{ $value }}
+    {{- end }}
 spec:
   type: {{ .type }}
   ports:

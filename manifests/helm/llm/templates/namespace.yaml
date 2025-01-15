@@ -9,3 +9,6 @@ metadata:
     kubernetes.io/metadata.name: {{ $.Values.namespace }}
     modelmesh-enabled: 'false'
     opendatahub.io/dashboard: 'true'
+    {{- range $key, $value := .labels }}
+    {{ $key }}: {{ $value }}
+    {{- end }}

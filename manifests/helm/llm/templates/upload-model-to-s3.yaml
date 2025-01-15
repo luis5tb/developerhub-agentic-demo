@@ -3,9 +3,18 @@ kind: Job
 metadata:
   name: upload-model-to-s3
   namespace: {{ $.Values.namespace }}
+  labels:
+    {{- range $key, $value := .labels }}
+    {{ $key }}: {{ $value }}
+    {{- end }}
 spec:
   selector: {}
   template:
+    metadata:
+      labels:
+        {{- range $key, $value := .labels }}
+        {{ $key }}: {{ $value }}
+        {{- end }}
     spec:
       containers:
         - name: upload-model-to-s3

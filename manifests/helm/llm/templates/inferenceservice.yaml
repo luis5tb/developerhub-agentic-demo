@@ -11,6 +11,9 @@ metadata:
     security.opendatahub.io/enable-auth: "true"
   labels:
     opendatahub.io/dashboard: "true"
+    {{- range $key, $value := .labels }}
+    {{ $key }}: {{ $value }}
+    {{- end }}
   name: {{ $.Values.name }}
   namespace: {{ $.Values.namespace }}
 spec:
