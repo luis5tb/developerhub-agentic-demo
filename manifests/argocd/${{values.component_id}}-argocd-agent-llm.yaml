@@ -6,6 +6,7 @@ metadata:
   namespace: multicloud-gitops-hub
   labels:
     argocd/app-name: ${{values.component_id}}-llm
+    backstage.io/kubernetes-id: ${{values.component_id}}
   annotations:
     argocd/app-name: ${{values.component_id}}-llm
 spec:
