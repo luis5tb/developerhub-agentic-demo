@@ -1,0 +1,39 @@
+apiVersion: triggers.tekton.dev/v1beta1
+kind: TriggerTemplate
+metadata:
+  name: build-tt
+spec:
+  params:
+  - name: git-repo-url
+    description: The git repository url
+  - name: git-repo-branch
+    description: The name of the branch
+  resourcetemplates:
+  - apiVersion: tekton.dev/v1
+    kind: PipelineRun
+    metadata:
+      generateName: build-deploy-$(tt.params.git-repo-name)-
+      labels:
+        backstage.io/kubernetes-id: ${{values.component_id}}
+        tekton.dev/pipeline: {{ .Values.name }}-pipeline
+    spec:
+      pipelineRef:
+        name: {{ .Values.name }}-pipeline
+      taskRunTemplate:
+        serviceAccountName: pipeline
+      timeouts:
+        pipeline: 1h0m0s
+      params:
+      - name: source-branch
+        value: $(tt.params.git-repo-branch)
+      - name: source-repo
+        value: $(tt.params.git-repo-url)
+      workspaces:
+      - name: shared-folder
+        volumeClaimTemplate:
+          spec:
+            accessModes:
+            - ReadWriteOnce
+            resources:
+              requests:
+                storage: 1Gi
