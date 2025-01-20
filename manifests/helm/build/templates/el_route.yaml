@@ -2,15 +2,15 @@
 kind: Route
 apiVersion: route.openshift.io/v1
 metadata:
-  name: webhook-build-el
+  name: webhook-{{ .Values.name }}-el
   labels:
     app.kubernetes.io/managed-by: EventListener
     app.kubernetes.io/part-of: Triggers
-    eventlistener: build-el
+    eventlistener: {{ .Values.name }}-el
 spec:
   to:
     kind: Service
-    name: el-build-el
+    name: el-{{ .Values.name }}-el
     weight: 100
   port:
     targetPort: http-listener

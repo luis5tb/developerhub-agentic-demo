@@ -1,7 +1,7 @@
 apiVersion: triggers.tekton.dev/v1beta1
 kind: TriggerTemplate
 metadata:
-  name: build-tt
+  name: {{ .Values.name }}-tt
 spec:
   params:
   - name: git-repo-url
@@ -12,7 +12,7 @@ spec:
   - apiVersion: tekton.dev/v1
     kind: PipelineRun
     metadata:
-      generateName: build-deploy-$(tt.params.git-repo-branch)-
+      generateName: {{ .Values.name }}-deploy-$(tt.params.git-repo-branch)-
       labels:
         backstage.io/kubernetes-id: ${{values.component_id}}
         tekton.dev/pipeline: {{ .Values.name }}-pipeline
