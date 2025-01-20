@@ -164,6 +164,8 @@ spec:
     links:
       - title: Source Code Repository
         url: ${{steps.publishSource.output.remoteUrl}}
+      - title: GitOps Source Code Repository
+        url: ${{steps.publishGitops.output.remoteUrl}}
       - title: Pipeline status
         url: https://console-openshift-console${{parameters.cluster_id}}/dev-pipelines/ns/${{parameters.namespace}}/
       - title: Open Component in catalog
