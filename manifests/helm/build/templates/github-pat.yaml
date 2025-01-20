@@ -23,4 +23,4 @@ spec:
   - secretKey: github-pat
     remoteRef:
       key: secret/data/hub/github-keys
-      property: "github-pat"
+      property: "github_pat"

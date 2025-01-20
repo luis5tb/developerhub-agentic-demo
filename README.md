@@ -26,9 +26,9 @@ $ cat values-secret.yaml.template
 
   - name: github-keys
     fields:
-    - name: github-pat
+    - name: github_pat
       value: XXXX
-    - name: webhook-secret
+    - name: webhook_secret
       value: XXXX
 
 # Regenerate the vault with the secrets
