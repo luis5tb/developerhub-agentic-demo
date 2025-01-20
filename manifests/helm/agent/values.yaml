@@ -2,8 +2,12 @@
 name: agent
 
 modelName: ${{values.model_name}}
+inferenceName: vllm
+saName: model-default
 
 namespace: ${{values.namespace}}
+vllNamespace: vllm-${{values.namespace}}
+cluster_app: ${{values.cluster}}
 
 labels:
   app: agent-app
