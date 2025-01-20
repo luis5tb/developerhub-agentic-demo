@@ -24,6 +24,13 @@ $ cat values-secret.yaml.template
     - name: GH_CLIENT_SECRET
       value: XXX
 
+  - name: github-keys
+    fields:
+    - name: github-pat
+      value: XXXX
+    - name: webhook-secret
+      value: XXXX
+
 # Regenerate the vault with the secrets
 $  cp values-secret.yaml.template ~/.config/hybrid-cloud-patterns/values-secret-multicloud-gitops.yaml
 $  ./pattern.sh make load-secrets

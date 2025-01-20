@@ -4,6 +4,8 @@ name: agent-build
 
 namespace: ${{values.namespace}}
 
+cluster_app: ${{values.cluster}}
+
 git:
   branch: main
   repo: ${{values.source_repository}}
@@ -15,3 +17,10 @@ image:
   name: ${{values.image_name}}
   tag: ${{values.image_tag}}
   url: ${{values.image_host}}/${{values.image_name}}:${{values.image_tag}}
+
+secretStore:
+  name: vault-backend
+  kind: ClusterSecretStore
+
+backstageLabels:
+  backstage.io/kubernetes-id: ${{values.component_id}}
