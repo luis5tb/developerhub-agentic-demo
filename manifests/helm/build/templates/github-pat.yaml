@@ -18,9 +18,9 @@ spec:
           {{ $key }}: {{ $value }}
           {{- end }}
       data:
-        token: "{{ `{{ .github-pat }}` }}"
+        token: "{{ `{{ .github_pat }}` }}"
   data:
-  - secretKey: github-pat
+  - secretKey: github_pat
     remoteRef:
       key: secret/data/hub/github-keys
       property: "github_pat"
