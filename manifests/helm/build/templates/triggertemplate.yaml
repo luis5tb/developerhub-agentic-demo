@@ -12,7 +12,7 @@ spec:
   - apiVersion: tekton.dev/v1
     kind: PipelineRun
     metadata:
-      generateName: build-deploy-$(tt.params.git-repo-name)-
+      generateName: build-deploy-$(tt.params.git-repo-branch)-
       labels:
         backstage.io/kubernetes-id: ${{values.component_id}}
         tekton.dev/pipeline: {{ .Values.name }}-pipeline
