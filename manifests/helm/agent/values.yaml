@@ -6,7 +6,7 @@ inferenceName: vllm
 saName: model-default
 
 namespace: ${{values.namespace}}
-vllNamespace: vllm-${{values.namespace}}
+vllmNamespace: vllm-${{values.namespace}}
 cluster_app: ${{values.cluster}}
 
 labels:
