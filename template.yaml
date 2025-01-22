@@ -76,6 +76,7 @@ spec:
           description: Name of the S3 bucket with the model
         oci_uri:
           title: OCI URI
+          type: string
           description: OCI URI for model container image
     - title: Provide Build Information
       required:
