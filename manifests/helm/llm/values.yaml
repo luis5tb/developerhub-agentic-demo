@@ -19,6 +19,8 @@ s3:
   default_endpoint: ${{values.s3_endpoint}}
   default_region: none
 
+uri: ${{values.oci_uri}}
+
 bucketSecret: ${{values.bucket}}
 
 backstageLabels:

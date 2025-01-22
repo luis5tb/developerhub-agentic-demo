@@ -28,12 +28,19 @@ spec:
         limits:
           cpu: "8"
           memory: 12Gi
-          #nvidia.com/gpu: '1'
+          nvidia.com/gpu: '1'
         requests:
           cpu: "4"
           memory: 12Gi
-          #nvidia.com/gpu: '1'
+          nvidia.com/gpu: '1'
       runtime: {{ $.Values.name }}
+      {{- if $.Values.uri }}
+      storageUri: {{ $.Values.uri }}
+      {{- else if $.Values.s3.default_endpoint }}
       storage:
         key: aws-connection-{{ $.Values.bucketSecret }}
         path: {{ $.Values.modelStoragePath }}
+      {{- else }}
+      # Default or error case (optional)
+      error: "Neither s3_endpoint nor oci_endpoint is defined."
+      {{- end }}

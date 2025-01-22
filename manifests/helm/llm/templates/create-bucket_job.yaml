@@ -1,3 +1,4 @@
+{{- if $.Values.s3.default_endpoint }}
 apiVersion: batch/v1
 kind: Job
 metadata:
@@ -40,3 +41,4 @@ spec:
           imagePullPolicy: IfNotPresent
           name: create-buckets
       restartPolicy: OnFailure
+{{- end }}

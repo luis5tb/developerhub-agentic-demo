@@ -52,9 +52,12 @@ spec:
               kind: [User]
     - title: Provide information about model
       required:
-        - model_name
-        - s3_endpoint
-        - bucket
+      - model_name
+      ui:options:
+        dependencies:
+          - s3_endpoint
+          - bucket
+          - oci_url
       properties:
         model_name:
           title: Model Name (from HF)
@@ -71,6 +74,9 @@ spec:
           default: models
           type: string
           description: Name of the S3 bucket with the model
+        oci_uri:
+          title: OCI URI
+          description: OCI URI for model container image
     - title: Provide Build Information
       required:
         - image_host
@@ -139,6 +145,7 @@ spec:
           model_name: ${{parameters.model_name}}
           s3_endpoint: ${{parameters.s3_endpoint}}
           bucket: ${{parameters.bucket}}
+          oci_uri: ${{parameters.oci_uri}}
         targetPath: ./tenant-gitops
     - id: publishGitops
       name: Publishing to Deployment Resource Repository
