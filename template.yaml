@@ -57,7 +57,7 @@ spec:
         dependencies:
           - s3_endpoint
           - bucket
-          - oci_url
+          - oci_uri
       properties:
         model_name:
           title: Model Name (from HF)
