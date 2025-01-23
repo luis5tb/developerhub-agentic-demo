@@ -1,3 +1,5 @@
+{{ $url := printf "https://%s-%s%s/v1" $.Values.inferenceName  $.Values.vllmNamespace $.Values.cluster_app }}
+---
 apiVersion: tekton.dev/v1
 kind: Pipeline
 metadata:
@@ -12,7 +14,7 @@ spec:
       description: name of the model to evaluate
       type: string
     - name: url
-      default: 
+      default: {{ $url }}
       description: model endpoint
       type: string
     - name: num_concurrent

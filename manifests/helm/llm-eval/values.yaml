@@ -4,6 +4,8 @@ name: evaljob
 namespace: ${{values.namespace}}
 
 modelName: ${{values.model_name}}
+inferenceName: vllm
+vllmNamespace: vllm-${{values.namespace}}
 cluster_app: ${{values.cluster}}
 
 evalOptions:
