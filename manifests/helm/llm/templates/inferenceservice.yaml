@@ -44,3 +44,7 @@ spec:
       # Default or error case (optional)
       error: "Neither s3_endpoint nor oci_endpoint is defined."
       {{- end }}
+    tolerations:
+      - effect: NoSchedule
+        key: nvidia.com/gpu
+        operator: Exists
