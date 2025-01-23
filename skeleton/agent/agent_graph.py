@@ -1,3 +1,5 @@
+import httpx
+
 from typing import Annotated
 from typing_extensions import TypedDict
 
@@ -5,7 +7,6 @@ from langgraph.graph import StateGraph
 from langgraph.graph.message import add_messages
 # from langgraph.llms import vLLM
 from langchain_community.llms import VLLMOpenAI
-
 
 # from vector_db import VectorDB
 from guardrails import apply_guardrails
@@ -16,7 +17,9 @@ class LLMNode:
         self.llm = VLLMOpenAI(
             openai_api_key=llm_token,
             openai_api_base=llm_endpoint,
-            model_name=model_name)
+            model_name=model_name,
+            async_client=httpx.AsyncClient(verify=False),
+            http_client=httpx.Client(verify=False))
 
     def __call__(self, state):
         # Implement your custom logic here
