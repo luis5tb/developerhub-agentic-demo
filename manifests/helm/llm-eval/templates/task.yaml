@@ -1,0 +1,83 @@
+apiVersion: tekton.dev/v1
+kind: Task
+metadata:
+  name: lmeval-task
+  labels:
+    backstage.io/kubernetes-id: ${{values.component_id}}
+spec:
+  params:
+    - name: model
+      description: name of the model to evaluate
+      type: string
+    - name: url
+      description: model endpoint
+      type: string
+    - name: num_concurrent
+      description: Concurrent requests
+      type: string
+    - name: max_retries
+      description: Max retries
+      type: string
+    - name: tokenized_requests
+      description: Tokenized requests
+      type: string
+    - name: tokenizer
+      description: Tokenizer
+      type: string
+    - name: task_name
+      type: string
+      description: Eval Task to use
+  steps:
+    - name: run-lmeval
+      image: {{ .Values.evalOption.baseImage }}
+      script: |
+        oc create -f - <<EOF
+        apiVersion: your-api-version
+        kind: LMEvalJob
+        metadata:
+          name: lmeval-job-$(context.pipelineRun.uid)
+        spec:
+          model: local-completions
+          taskList:
+            taskNames:
+              - $(params.taskname)
+          logSamples: true
+          batchSize: 1
+          modelArgs:
+            - name: model
+              value: $(params.model)
+            - name: base_url
+              value: $(params.url)/v1/completions 
+            - name: num_concurrent
+              value: $(params.num_concurrent)
+            - name: max_retries
+              value: $(params.max_retries)
+            - name: tokenized_requests
+              value: $(params.tokenized_requests)
+            - name: tokenizer
+              value: $(params.tokenizer)
+          pod: 
+            container:
+              env:
+              - name: OPENAI_API_KEY 
+                valueFrom:
+                      secretKeyRef: 
+                        name: llm-sa-secret
+                        key: token 
+              resources:
+                  limits: 
+                    cpu: '1'
+                    memory: 8Gi
+                    nvidia.com/gpu: '1'
+                  requests:
+                    cpu: '1'
+                    memory: 8Gi
+                    nvidia.com/gpu: '1'
+          outputs: 
+            pvcManaged: 
+              size: 5Gi 
+        EOF
+        # Wait for job completion
+        oc wait --for=condition=complete job/lmeval-job-$(context.pipelineRun.uid)
+  workspaces:
+    - name: shared-data

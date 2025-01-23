@@ -1,0 +1,58 @@
+apiVersion: tekton.dev/v1
+kind: Pipeline
+metadata:
+  name: {{ .Values.name }}-pipeline
+  labels:
+    type: pipeline
+    backstage.io/kubernetes-id: ${{values.component_id}}
+spec:
+  params:
+    - name: model
+      default: {{ .Values.modelName }}
+      description: name of the model to evaluate
+      type: string
+    - name: url
+      default: 
+      description: model endpoint
+      type: string
+    - name: num_concurrent
+      default: {{ .Values.evalOptions.numConcurrent }}
+      description: Concurrent requests
+      type: string
+    - name: max_retries
+      default: {{ .Values.evalOptions.maxRetries }}
+      description: Max retries
+      type: string
+    - name: tokenized_requests
+      default: {{ .Values.evalOptions.tokenizedRequests }}
+      description: Tokenized requests
+      type: string
+    - name: tokenizer
+      default: {{ .Values.evalOptions.tokenizer }}
+      description: Tokenizer
+      type: string
+    - name: task_name
+      default: {{ .Values.evalOptions.taskName}}
+      type: string
+      description: Eval Task to use
+  tasks:
+    - name: run-lmeval-job
+      taskRef:
+        name: lmeval-task
+      params:
+        - name: model
+          value: $(params.model)
+        - name: url
+          value: $(params.url)
+        - name: num_concurrent
+          value: $(params.num_concurrent)
+        - name: max_retries
+          value: $(params.max_retries)
+        - name: tokenized_requests
+          value: $(params.tokenized_requests)
+        - name: tokenizer
+          value: $(params.tokenizer)
+        - name: task_name
+          value: $(params.task_name)
+  workspaces:
+    - name: shared-data

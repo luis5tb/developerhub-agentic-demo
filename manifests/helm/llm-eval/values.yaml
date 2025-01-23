@@ -1,0 +1,22 @@
+---
+
+name: evaljob
+namespace: ${{values.namespace}}
+
+modelName: ${{values.model_name}}
+cluster_app: ${{values.cluster}}
+
+evalOptions:
+  numConcurrent: "1"
+  maxRetries: "3"
+  tokenizedRequests: "False"
+  tokenizer: ibm-granite/granite-7b-instruct
+  taskName: mmlu
+  baseImage: image-registry.openshift-image-registry.svc:5000/openshift/cli:latest
+
+secretStore:
+  name: vault-backend
+  kind: ClusterSecretStore
+
+backstageLabels:
+  backstage.io/kubernetes-id: ${{values.component_id}}
