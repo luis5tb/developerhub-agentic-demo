@@ -27,11 +27,11 @@ spec:
       resources:
         limits:
           cpu: "8"
-          memory: 12Gi
+          memory: 10Gi
           nvidia.com/gpu: '1'
         requests:
           cpu: "4"
-          memory: 12Gi
+          memory: 8Gi
           nvidia.com/gpu: '1'
       runtime: {{ $.Values.name }}
       {{- if $.Values.uri }}
