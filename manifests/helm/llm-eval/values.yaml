@@ -3,6 +3,7 @@
 name: evaljob
 namespace: vllm-${{values.namespace}}
 modelName: ${{values.model_name}}
+saName: model-default
 cluster_app: ${{values.cluster}}
 
 evalOptions:

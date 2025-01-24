@@ -64,7 +64,7 @@ spec:
               - name: OPENAI_API_KEY 
                 valueFrom:
                       secretKeyRef: 
-                        name: llm-sa-secret
+                        name: {{ $.Values.saName }}-{{ $.Values.modelName }}-sa
                         key: token 
               resources:
                   limits: 
