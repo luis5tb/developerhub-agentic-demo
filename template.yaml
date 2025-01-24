@@ -31,6 +31,7 @@ spec:
       required:
         - cluster_id
         - namespace
+        - argo_instance
         - owner
       properties:
         cluster_id:
@@ -42,6 +43,16 @@ spec:
           title: Namespace
           type: string
           description: Namespace
+        argo_instance:
+          title: ArgoCD Instance
+          type: string
+          description: ArgoCD instance name to be used
+          default: default
+        argo_namespace:
+          title: ArgoCD Namespace
+          type: string
+          description: Namespace for the argo apps to be deployed
+          default: multicloud-gitops-hub
         owner:
           title: Owner
           type: string
@@ -164,8 +175,8 @@ spec:
       action: argocd:create-resources
       input:
         appName: ${{parameters.namespace}}-agent-hyperscalers-bootstrap
-        argoInstance: main
-        namespace: multicloud-gitops-hub
+        argoInstance: ${{parameters.argo_instance}}
+        namespace: ${{parameterse.argo_namespace}}
         repoUrl: https://github.com/${{parameters.githubOrg}}/${{parameters.namespace}}-agent-hyperscalers-gitops.git
         path: 'argocd/'
   output:
