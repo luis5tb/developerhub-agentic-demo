@@ -9,9 +9,9 @@ vllmNamespace: vllm-${{values.namespace}}
 cluster_app: ${{values.cluster}}
 
 evalOptions:
-  numConcurrent: "1"
-  maxRetries: "3"
-  tokenizedRequests: "False"
+  numConcurrent: 1
+  maxRetries: 3
+  tokenizedRequests: false
   tokenizer: ibm-granite/granite-7b-instruct
   taskName: mmlu
   baseImage: image-registry.openshift-image-registry.svc:5000/openshift/cli:latest
