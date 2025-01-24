@@ -6,11 +6,11 @@ metadata:
 spec:
   storage:
 	  format: "PVC"
-	  folder: "/inputs"
-	  size: "1Gi"
+    folder: "/inputs"
+    size: "1Gi"
   data:
-	  filename: "data.csv"
-	  format: "CSV"
+    filename: "data.csv"
+    format: "CSV"
   metrics:
-  	schedule: "5s"
-  	batchSize: 5000
+    schedule: "5s"
+    batchSize: 5000
