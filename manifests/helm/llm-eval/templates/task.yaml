@@ -32,7 +32,7 @@ spec:
       image: {{ .Values.evalOptions.baseImage }}
       script: |
         oc create -f - <<EOF
-        apiVersion: your-api-version
+        apiVersion: trustyai.opendatahub.io/v1alpha1
         kind: LMEvalJob
         metadata:
           name: lmeval-job-$(context.pipelineRun.uid)
@@ -40,7 +40,7 @@ spec:
           model: local-completions
           taskList:
             taskNames:
-              - $(params.taskname)
+              - $(params.task_name)
           logSamples: true
           batchSize: 1
           modelArgs:
