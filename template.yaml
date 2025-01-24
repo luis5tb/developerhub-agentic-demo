@@ -32,6 +32,7 @@ spec:
         - cluster_id
         - namespace
         - argo_instance
+        - argo_namespace
         - owner
       properties:
         cluster_id:
@@ -176,7 +177,7 @@ spec:
       input:
         appName: ${{parameters.namespace}}-agent-hyperscalers-bootstrap
         argoInstance: ${{parameters.argo_instance}}
-        namespace: ${{parameterse.argo_namespace}}
+        namespace: ${{parameters.argo_namespace}}
         repoUrl: https://github.com/${{parameters.githubOrg}}/${{parameters.namespace}}-agent-hyperscalers-gitops.git
         path: 'argocd/'
   output:
