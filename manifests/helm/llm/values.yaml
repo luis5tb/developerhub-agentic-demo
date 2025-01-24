@@ -17,6 +17,7 @@ secretStore:
 s3:
   default_endpoint: ${{values.s3_endpoint}}
   default_region: none
+  hf_path: ${{values.hf_path}}
 
 uri: ${{values.oci_uri}}
 

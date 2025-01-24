@@ -93,7 +93,7 @@ spec:
             - name: MODEL_NAME
               value: '{{ $.Values.modelName }}'
             - name: REPO_URL
-              value: https://huggingface.co/'{{ $.Values.modelName }}'.git
+              value: https://huggingface.co/'{{ $.Values.s3.hf_path }}'.git
           command:
             - /bin/sh
             - -c
