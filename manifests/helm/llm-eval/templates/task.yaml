@@ -80,6 +80,6 @@ spec:
               size: 5Gi 
         EOF
         # Wait for job completion
-        oc wait -n {{ .Values.namespace }} --for=condition=complete lmevaljob/lmeval-job
+        oc wait -n {{ .Values.namespace }} --timeout=3600s --for=condition=complete lmevaljob/lmeval-job
   workspaces:
     - name: shared-data
