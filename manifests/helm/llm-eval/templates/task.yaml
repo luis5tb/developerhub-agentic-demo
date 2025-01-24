@@ -29,7 +29,7 @@ spec:
       description: Eval Task to use
   steps:
     - name: run-lmeval
-      image: {{ .Values.evalOption.baseImage }}
+      image: {{ .Values.evalOptions.baseImage }}
       script: |
         oc create -f - <<EOF
         apiVersion: your-api-version
