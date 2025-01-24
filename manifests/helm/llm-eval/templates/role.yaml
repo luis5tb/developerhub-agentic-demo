@@ -1,0 +1,8 @@
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  name: lmeval-job-creator
+rules:
+- apiGroups: ["trustyai.opendatahub.io"]
+  resources: ["lmevaljobs"]
+  verbs: ["create", "get", "list", "watch"]

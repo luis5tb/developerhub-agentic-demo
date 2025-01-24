@@ -35,25 +35,25 @@ spec:
         apiVersion: trustyai.opendatahub.io/v1alpha1
         kind: LMEvalJob
         metadata:
-          name: lmeval-job-$(context.pipelineRun.uid)
+          name: lmeval-job
         spec:
           model: local-completions
           taskList:
             taskNames:
               - $(params.task_name)
           logSamples: true
-          batchSize: 1
+          batchSize: "1"
           modelArgs:
             - name: model
               value: $(params.model)
             - name: base_url
               value: $(params.url)/v1/completions 
             - name: num_concurrent
-              value: $(params.num_concurrent)
+              value: "$(params.num_concurrent)"
             - name: max_retries
-              value: $(params.max_retries)
+              value: "$(params.max_retries)"
             - name: tokenized_requests
-              value: $(params.tokenized_requests)
+              value: "$(params.tokenized_requests)"
             - name: tokenizer
               value: $(params.tokenizer)
           pod: 
@@ -78,6 +78,6 @@ spec:
               size: 5Gi 
         EOF
         # Wait for job completion
-        oc wait --for=condition=complete job/lmeval-job-$(context.pipelineRun.uid)
+        oc wait --for=condition=complete lmevaljob/lmeval-job
   workspaces:
     - name: shared-data
