@@ -18,17 +18,17 @@ spec:
       description: model endpoint
       type: string
     - name: num_concurrent
-      default: {{ .Values.evalOptions.numConcurrent }}
+      default: "{{ .Values.evalOptions.numConcurrent }}"
       description: Concurrent requests
-      type: number
+      type: string
     - name: max_retries
-      default: {{ .Values.evalOptions.maxRetries }}
+      default: "{{ .Values.evalOptions.maxRetries }}"
       description: Max retries
-      type: number
+      type: string
     - name: tokenized_requests
-      default: {{ .Values.evalOptions.tokenizedRequests }}
+      default: "{{ .Values.evalOptions.tokenizedRequests }}"
       description: Tokenized requests
-      type: boolean
+      type: string
     - name: tokenizer
       default: {{ .Values.evalOptions.tokenizer }}
       description: Tokenizer

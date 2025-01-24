@@ -14,13 +14,13 @@ spec:
       type: string
     - name: num_concurrent
       description: Concurrent requests
-      type: number
+      type: string
     - name: max_retries
       description: Max retries
-      type: number
+      type: string
     - name: tokenized_requests
       description: Tokenized requests
-      type: boolean
+      type: string
     - name: tokenizer
       description: Tokenizer
       type: string
