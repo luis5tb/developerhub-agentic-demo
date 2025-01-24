@@ -2,6 +2,7 @@ apiVersion: tekton.dev/v1
 kind: Task
 metadata:
   name: lmeval-task
+  namespace: {{ .Values.namespace }}
   labels:
     backstage.io/kubernetes-id: ${{values.component_id}}
 spec:
@@ -36,6 +37,7 @@ spec:
         kind: LMEvalJob
         metadata:
           name: lmeval-job
+          namespace: {{ .Values.namespace}}
         spec:
           model: local-completions
           taskList:
@@ -78,6 +80,6 @@ spec:
               size: 5Gi 
         EOF
         # Wait for job completion
-        oc wait --for=condition=complete lmevaljob/lmeval-job
+        oc wait -n {{ .Values.namespace }} --for=condition=complete lmevaljob/lmeval-job
   workspaces:
     - name: shared-data

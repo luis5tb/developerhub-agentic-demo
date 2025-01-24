@@ -2,6 +2,7 @@ apiVersion: rbac.authorization.k8s.io/v1
 kind: Role
 metadata:
   name: lmeval-job-creator
+  namespace: {{ .Values.namespace }}
 rules:
 - apiGroups: ["trustyai.opendatahub.io"]
   resources: ["lmevaljobs"]

@@ -1,9 +1,10 @@
-{{ $url := printf "https://%s-%s%s" $.Values.modelName  $.Values.vllmNamespace $.Values.cluster_app }}
+{{ $url := printf "https://%s-%s%s" $.Values.modelName  $.Values.Namespace $.Values.cluster_app }}
 ---
 apiVersion: tekton.dev/v1
 kind: Pipeline
 metadata:
   name: {{ .Values.name }}-pipeline
+  namespace: {{ .Values.namespace }}
   labels:
     type: pipeline
     backstage.io/kubernetes-id: ${{values.component_id}}
