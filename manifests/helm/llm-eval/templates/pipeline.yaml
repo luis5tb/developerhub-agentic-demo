@@ -56,5 +56,8 @@ spec:
           value: $(params.tokenizer)
         - name: task_name
           value: $(params.task_name)
+      workspaces:
+        - name: output
+          workspace: shared-data
   workspaces:
     - name: shared-data
