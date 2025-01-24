@@ -20,15 +20,15 @@ spec:
     - name: num_concurrent
       default: {{ .Values.evalOptions.numConcurrent }}
       description: Concurrent requests
-      type: string
+      type: number
     - name: max_retries
       default: {{ .Values.evalOptions.maxRetries }}
       description: Max retries
-      type: string
+      type: number
     - name: tokenized_requests
       default: {{ .Values.evalOptions.tokenizedRequests }}
       description: Tokenized requests
-      type: string
+      type: boolean
     - name: tokenizer
       default: {{ .Values.evalOptions.tokenizer }}
       description: Tokenizer
