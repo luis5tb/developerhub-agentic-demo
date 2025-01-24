@@ -1,4 +1,4 @@
-{{ $url := printf "https://%s-%s%s/v1" $.Values.inferenceName  $.Values.vllmNamespace $.Values.cluster_app }}
+{{ $url := printf "https://%s-%s%s/v1" $.Values.modelName  $.Values.vllmNamespace $.Values.cluster_app }}
 ---
 apiVersion: tekton.dev/v1
 kind: Pipeline

@@ -1,14 +1,14 @@
 kind: RoleBinding
 apiVersion: rbac.authorization.k8s.io/v1
 metadata:
-  name: {{ $.Values.name }}-view
+  name: {{ $.Values.modelName }}-view
   namespace: {{ $.Values.namespace }}
   labels:
     opendatahub.io/dashboard: 'true'
 subjects:
   - kind: ServiceAccount
-    name: {{ $.Values.name }}-sa
+    name: {{ $.Values.modelName }}-sa
 roleRef:
   apiGroup: rbac.authorization.k8s.io
   kind: Role
-  name: {{ $.Values.name }}-view-role
+  name: {{ $.Values.modelName }}-view-role

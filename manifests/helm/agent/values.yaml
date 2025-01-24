@@ -2,7 +2,6 @@
 name: agent
 
 modelName: ${{values.model_name}}
-inferenceName: vllm
 saName: model-default
 
 namespace: ${{values.namespace}}

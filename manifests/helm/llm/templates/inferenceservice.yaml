@@ -2,7 +2,7 @@ apiVersion: serving.kserve.io/v1beta1
 kind: InferenceService
 metadata:
   annotations:
-    openshift.io/display-name: vllm
+    openshift.io/display-name: {{ $.Values.modelName }}
     serving.knative.openshift.io/enablePassthrough: "true"
     sidecar.istio.io/inject: "true"
     sidecar.istio.io/rewriteAppHTTPProbers: "true"
@@ -14,7 +14,7 @@ metadata:
     {{- range $key, $value := $.Values.backstageLabels }}
     {{ $key }}: {{ $value }}
     {{- end }}
-  name: {{ $.Values.name }}
+  name: {{ $.Values.modelName }}
   namespace: {{ $.Values.namespace }}
 spec:
   predictor:
@@ -33,7 +33,7 @@ spec:
           cpu: "4"
           memory: 8Gi
           nvidia.com/gpu: '1'
-      runtime: {{ $.Values.name }}
+      runtime: vllm
       {{- if $.Values.uri }}
       storageUri: {{ $.Values.uri }}
       {{- else if $.Values.s3.default_endpoint }}

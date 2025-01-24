@@ -1,11 +1,11 @@
 apiVersion: v1
 kind: Secret
 metadata:
-  name: {{ $.Values.saName }}-{{ $.Values.name }}-sa
+  name: {{ $.Values.saName }}-{{ $.Values.modelName }}-sa
   namespace: {{ $.Values.namespace }}
   labels:
     opendatahub.io/dashboard: 'true'
   annotations:
-    kubernetes.io/service-account.name: {{ $.Values.name }}-sa
+    kubernetes.io/service-account.name: {{ $.Values.modelName }}-sa
     openshift.io/display-name: {{ $.Values.saName }}
 type: kubernetes.io/service-account-token

@@ -7,15 +7,13 @@ metadata:
     opendatahub.io/recommended-accelerators: '["nvidia.com/gpu"]'
     opendatahub.io/template-display-name: vLLM ServingRuntime for KServe
     opendatahub.io/template-name: vllm-runtime
-    openshift.io/display-name: {{ $.Values.name }}
-  creationTimestamp: "2025-01-07T15:03:21Z"
-  generation: 1
+    openshift.io/display-name: vllm
   labels:
     opendatahub.io/dashboard: "true"
     {{- range $key, $value := $.Values.backstageLabels }}
     {{ $key }}: {{ $value }}
     {{- end }}
-  name: {{ $.Values.name }}
+  name: vllm
   namespace: {{ $.Values.namespace }}
 spec:
   annotations:

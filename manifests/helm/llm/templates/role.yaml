@@ -1,7 +1,7 @@
 kind: Role
 apiVersion: rbac.authorization.k8s.io/v1
 metadata:
-  name: {{ $.Values.name }}-view-role
+  name: {{ $.Values.modelName }}-view-role
   namespace:  {{ $.Values.namespace }}
   labels:
     opendatahub.io/dashboard: 'true'
@@ -13,4 +13,4 @@ rules:
     resources:
       - inferenceservices
     resourceNames:
-      - {{ $.Values.name }}
+      - {{ $.Values.modelName }}

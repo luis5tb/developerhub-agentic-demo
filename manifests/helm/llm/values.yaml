@@ -1,5 +1,4 @@
 ---
-name: vllm
 saName: model-default
 
 namespace: vllm-${{values.namespace}}
