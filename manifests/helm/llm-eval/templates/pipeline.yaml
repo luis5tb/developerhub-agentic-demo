@@ -57,7 +57,7 @@ spec:
         - name: task_name
           value: $(params.task_name)
       workspaces:
-        - name: output
+        - name: shared-data
           workspace: shared-data
   workspaces:
     - name: shared-data
