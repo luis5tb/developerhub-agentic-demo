@@ -10,7 +10,8 @@ evalOptions:
   numConcurrent: 1
   maxRetries: 3
   tokenizedRequests: false
-  tokenizer: ibm-granite/granite-7b-instruct
+  verifyCertificate: false
+  tokenizer: ibm-granite/granite-3.1-2b-instruct
   taskName: mmlu
   baseImage: image-registry.openshift-image-registry.svc:5000/openshift/cli:latest
 

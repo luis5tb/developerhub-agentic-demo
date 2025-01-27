@@ -46,7 +46,7 @@ spec:
           logSamples: true
           batchSize: "1"
           allowOnline: true
-          allowCodeExecution: true
+          allowCodeExecution: false
           modelArgs:
             - name: model
               value: $(params.model)
@@ -60,6 +60,8 @@ spec:
               value: "$(params.tokenized_requests)"
             - name: tokenizer
               value: $(params.tokenizer)
+            - name: verify_certificate
+              value: "{{ $.Values.evalOptions.verifyCertificate }}"
           pod: 
             container:
               env:
