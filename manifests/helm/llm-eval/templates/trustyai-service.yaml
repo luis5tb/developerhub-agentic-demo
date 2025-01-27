@@ -5,9 +5,9 @@ metadata:
   namespace: {{ .Values.namespace }}
 spec:
   storage:
-	  format: "PVC"
+    format: "PVC"
     folder: "/inputs"
-    size: "1Gi"
+    size: "10Gi"
   data:
     filename: "data.csv"
     format: "CSV"
