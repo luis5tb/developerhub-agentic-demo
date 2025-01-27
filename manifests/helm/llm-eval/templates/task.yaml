@@ -45,6 +45,8 @@ spec:
               - $(params.task_name)
           logSamples: true
           batchSize: "1"
+          allowOnline: true
+          allowCodeExecution: true
           modelArgs:
             - name: model
               value: $(params.model)
