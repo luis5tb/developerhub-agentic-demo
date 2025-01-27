@@ -1,4 +1,4 @@
-{{ $url := printf "https://%s-%s%s" $.Values.modelName  $.Values.Namespace $.Values.cluster_app }}
+{{ $url := printf "https://%s-%s%s" $.Values.modelName  $.Values.namespace $.Values.cluster_app }}
 ---
 apiVersion: tekton.dev/v1
 kind: Pipeline
