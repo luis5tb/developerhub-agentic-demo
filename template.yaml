@@ -65,6 +65,7 @@ spec:
     - title: Provide information about model
       required:
       - model_name
+      - tool_parser
       ui:options:
         dependencies:
           - hf_path
@@ -77,6 +78,11 @@ spec:
           default: granite
           type: string
           description: Name of the model to be deployed
+        tool_parser:
+          title: ServingRuntime Tool Parser
+          default: granite
+          type: string
+          description: Tool parser to enable at the ServingRuntime
         hf_path:
           title: Hugging Face path to the model
           default: ibm-granite/granite-3.1-2b-instruct
@@ -162,6 +168,7 @@ spec:
           image_name: ${{parameters.namespace}}/agent-hyperscalers-app
           image_tag: ${{parameters.image_tag}}
           model_name: ${{parameters.model_name}}
+          tool_parser: ${{parameters.tool_parser}}
           hf_path: ${{parameters.hf_path}}
           s3_endpoint: ${{parameters.s3_endpoint}}
           bucket: ${{parameters.bucket}}
