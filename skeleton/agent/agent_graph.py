@@ -1,39 +1,18 @@
-import httpx
 
-from typing import Annotated
-from typing_extensions import TypedDict
 
 from langgraph.graph import StateGraph
+# from langgraph.graph import StateGraph, END
 from langgraph.graph.message import add_messages
-# from langgraph.llms import vLLM
-from langchain_community.llms import VLLMOpenAI
+from langgraph.checkpoint.memory import MemorySaver
+# from langgraph.prebuilt import ToolNode, tools_condition
+from langgraph.prebuilt import ToolNode
 
 # from vector_db import VectorDB
 from guardrails import apply_guardrails
 
-
-class LLMNode:
-    def __init__(self,  llm_endpoint, llm_token, model_name):
-        self.llm = VLLMOpenAI(
-            openai_api_key=llm_token,
-            openai_api_base=llm_endpoint,
-            model_name=model_name,
-            async_client=httpx.AsyncClient(verify=False),
-            http_client=httpx.Client(verify=False))
-
-    def __call__(self, state):
-        # Implement your custom logic here
-        # Access the state and perform actions
-        messages = state["messages"]
-        response = self.llm.invoke(messages)
-        return {"messages": add_messages(messages, [response])}
-
-
-class State(TypedDict):
-    # messages have the type "list".
-    # The add_messages function appends messages to the list,
-    # rather than overwriting them
-    messages: Annotated[list, add_messages]
+from tools import get_tools
+import agents
+import agent_states
 
 
 class AgentGraph:
@@ -46,36 +25,76 @@ class AgentGraph:
             llm_token (str): Authorization token for the vLLM endpoint.
         """
         # self.vector_db = VectorDB()
-        self.llm = LLMNode(llm_endpoint=llm_endpoint, llm_token=llm_token,
-                           model_name=model_name)
+
+        tools = get_tools()
+        self.tools_node = ToolNode(tools)
+
+        self.researcher_node = agents.ResearchAgent(
+            llm_endpoint=llm_endpoint,
+            llm_token=llm_token,
+            model_name=model_name,
+            tools=tools)
+
+        self.summarization_node = agents.SummarizationAgent(
+            llm_endpoint=llm_endpoint,
+            llm_token=llm_token,
+            model_name=model_name)
+
+        self.recommender_node = agents.RecommendationAgent(
+            llm_endpoint=llm_endpoint,
+            llm_token=llm_token,
+            model_name=model_name)
 
         # Build the graph
-        graph_builder = StateGraph(State)
+        graph_builder = StateGraph(agent_states.State)
+        # graph_builder = StateGraph(agent_states.State,
+        #                            input=agent_states.InputState,
+        #                            output=agent_states.OutputState)
 
         # Add nodes to the graph
         # graph_builder.add_node("input_guardrails",
         #                        self.apply_input_guardrails)
         # graph_builder.add_node("context_retrieval",
         #                        self.retrieve_context)
-        graph_builder.add_node("llm", self.llm)
+        graph_builder.add_node("researcher", self.researcher_node)
+        graph_builder.add_node("tools", self.tools_node)
+        graph_builder.add_node("summarizer", self.summarization_node)
+        graph_builder.add_node("recommender", self.recommender_node)
+
         # graph_builder.add_node("output_guardrails",
         #                        self.apply_output_guardrails)
 
         # Define transitions between nodes
+        graph_builder.add_edge("tools", "researcher")
         # graph_builder.add_edge("input_guardrails", "context_retrieval")
         # graph_builder.add_edge("context_retrieval", "llm")
         # graph_builder.add_edge("llm", "output_guardrails")
+        graph_builder.add_edge("summarizer", "recommender")
+
+        # graph_builder.add_conditional_edges("researcher", tools_condition)
+        graph_builder.add_conditional_edges(
+            "researcher", self.should_continue,
+            {"continue": "summarizer", "tools": "tools"})
 
         # Set entry and finish points
         # graph_builder.set_entry_point("input_guardrails")
         # graph_builder.set_finish_point("output_guardrails")
-        graph_builder.set_entry_point("llm")
-        graph_builder.set_finish_point("llm")
+        graph_builder.set_entry_point("researcher")
+        graph_builder.set_finish_point("recommender")
 
         # Compile the graph
-        self.agent = graph_builder.compile()
+        memory = MemorySaver()
+        self.agent = graph_builder.compile(checkpointer=memory)
 
-    def apply_input_guardrails(self, state: State) -> State:
+    def should_continue(self, state: agent_states.State):
+        messages = state["messages"]
+        last_message = messages[-1]
+        if last_message.tool_calls:
+            return "tools"
+        return "continue"
+
+    def apply_input_guardrails(
+            self, state: agent_states.State) -> agent_states.State:
         """
         Apply input guardrails to validate or preprocess the query.
 
@@ -89,7 +108,8 @@ class AgentGraph:
                              for msg in state["messages"]]
         return state
 
-    def apply_output_guardrails(self, state: State) -> State:
+    def apply_output_guardrails(
+            self, state: agent_states.State) -> agent_states.State:
         """
         Apply output guardrails to validate or postprocess the response.
 
@@ -103,7 +123,8 @@ class AgentGraph:
                              for msg in state["messages"]]
         return state
 
-    def retrieve_context(self, state: State) -> State:
+    def retrieve_context(
+            self, state: agent_states.State) -> agent_states.State:
         """
         Retrieve context from the vector database.
 
@@ -119,18 +140,9 @@ class AgentGraph:
         return state
 
     def run(self, query) -> list:
-        """
-        Run the agent with the given messages.
-
-        Args:
-            messages (list): List of conversation messages.
-
-        Returns:
-            list: Updated messages with responses.
-        """
-        # initial_state = {"messages": messages}
-        # #final_state = self.agent.run(initial_input=initial_state)
-        # final_state = self.agent(initial_state)
-        response = self.agent.invoke({"messages": [query]})
-        return response["messages"][-1]
-        # return final_state["messages"]
+        config = {"configurable": {"thread_id": "1"}}
+        request = {
+            "stock": query,
+        }
+        response = self.agent.invoke(request, config)
+        return response["recommendation"][-1]
