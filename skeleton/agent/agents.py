@@ -40,7 +40,7 @@ class ResearchAgent:
             tool_names=", ".join([tool.name for tool in tools]))
 
         if tools:
-            self.agent = research_prompt | self.llm.bind_tools(tools)
+            self.agent = research_prompt | self.llm.bind_tools(tools, strict=True, tool_choice="auto")
         else:
             self.agent = research_prompt | self.llm
 
