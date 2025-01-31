@@ -25,7 +25,7 @@ metadata:
     - url: https://console-openshift-console${{values.cluster_id}}/k8s/ns/${{values.namespace}}/deployments/agent
       title: Deployment
       icon: web
-    - url: https://rhods-dashboard-redhat-ods-applications.${{values.cluster_id}}/projects/vllm-${{values.namespace}}
+    - url: https://rhods-dashboard-redhat-ods-applications${{values.cluster_id}}/projects/vllm-${{values.namespace}}
       title: RHOAI Data Science Project
       icon: web
     - url: https://devspaces${{values.cluster_id}}/#https://github.com/${{values.githubOrg}}/${{values.repoName}}?che-editor=che-incubator/che-code/latest&devfilePath=.devfile-vscode.yaml
