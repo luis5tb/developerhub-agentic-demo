@@ -12,8 +12,9 @@ from langchain.callbacks.streaming_stdout import StreamingStdOutCallbackHandler
 # from langchain.prompts import PromptTemplate
 # from langchain_core.messages import BaseMessage
 
-import prompts
 import agent_states
+import httpx
+import prompts
 
 
 class ResearchAgent:
@@ -28,7 +29,9 @@ class ResearchAgent:
             max_tokens=2048,
             presence_penalty=1.03,
             streaming=True,
-            callbacks=[StreamingStdOutCallbackHandler()])
+            callbacks=[StreamingStdOutCallbackHandler()],
+            async_client=httpx.AsyncClient(verify=False),
+            http_client=httpx.Client(verify=False))
 
         research_prompt = ChatPromptTemplate.from_messages([
             ("system", prompts.researcher_prompt),
@@ -74,7 +77,9 @@ class SummarizationAgent:
             max_tokens=2048,
             presence_penalty=1.03,
             streaming=True,
-            callbacks=[StreamingStdOutCallbackHandler()])
+            callbacks=[StreamingStdOutCallbackHandler()],
+            async_client=httpx.AsyncClient(verify=False),
+            http_client=httpx.Client(verify=False))
 
         summary_prompt = ChatPromptTemplate.from_messages([
             ("system", prompts.system_prompt),
@@ -107,7 +112,9 @@ class RecommendationAgent:
             max_tokens=2048,
             presence_penalty=1.03,
             streaming=True,
-            callbacks=[StreamingStdOutCallbackHandler()])
+            callbacks=[StreamingStdOutCallbackHandler()],
+            async_client=httpx.AsyncClient(verify=False),
+            http_client=httpx.Client(verify=False))
 
         recommendation_prompt = ChatPromptTemplate.from_messages([
             ("system", prompts.system_prompt),
