@@ -10,6 +10,7 @@ displayName: "Agent VLLM namespace"
 modelStoragePath: ibm-model
 modelName: ${{values.model_name}}
 toolParser: ${{values.tool_parser}}
+maxModelLen: 6048
 
 secretStore:
   name: vault-backend
