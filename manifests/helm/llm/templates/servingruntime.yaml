@@ -37,7 +37,9 @@ spec:
     env:
     - name: HF_HOME
       value: /tmp/hf_home
-    image: quay.io/modh/vllm@sha256:c86ff1e89c86bc9821b75d7f2bbc170b3c13e3ccf538bf543b1110f23e056316
+    #image: quay.io/modh/vllm@sha256:c86ff1e89c86bc9821b75d7f2bbc170b3c13e3ccf538bf543b1110f23e056316
+    # to support function calling, until RHOAI 2.17 vllm version supports it
+    image: quay.io/opendatahub/vllm@sha256:f7e40286a9e0a5870fcb96f3dc6c2cb094ed8eb8d9a17dc886fc6aae2ad06519
     name: kserve-container
     ports:
     - containerPort: 8080
