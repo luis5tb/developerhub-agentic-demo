@@ -83,14 +83,16 @@ class AgentGraph:
         graph_builder.set_finish_point("recommender")
 
         # Compile the graph
-        memory = MemorySaver()
-        self.agent = graph_builder.compile(checkpointer=memory)
+        #memory = MemorySaver()
+        self.agent = graph_builder.compile()  # checkpointer=memory)
 
     def should_continue(self, state: agent_states.State):
         messages = state["messages"]
         last_message = messages[-1]
         if last_message.tool_calls:
+            print("Calling tools")
             return "tools"
+        print("Calling summarizer")
         return "continue"
 
     def apply_input_guardrails(
@@ -140,9 +142,10 @@ class AgentGraph:
         return state
 
     def run(self, query) -> list:
-        config = {"configurable": {"thread_id": "1"}}
-        request = {
-            "stock": query,
-        }
-        response = self.agent.invoke(request, config)
+        #config = {"configurable": {"thread_id": "1"}}
+        initial_state = agent_states.State(stock=query,
+                                           messages=[],
+                                           summary=[],
+                                           recommendation=[])
+        response = self.agent.invoke(initial_state)  #, config)
         return response["recommendation"][-1]

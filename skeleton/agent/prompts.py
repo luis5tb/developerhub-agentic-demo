@@ -14,15 +14,17 @@ Your primary responsibility is to **use the provided tools** to fetch updated an
 ### **Available Tools:**
 {tool_names}
 
-### **Task Information:**
-- **Stock:** {stock}
-- **Feedback (if any):** {feedback}
-
 ### **Response Format:**
 When external data is needed, output a **structured tool call** instead of a natural language response.
 
 Strictly follow these guidelines before responding.
+
+### **Task Information:**
+{stock}
 """
+
+# - **Stock:** {stock}
+# - **Feedback (if any):** {feedback}
 
 summary_prompt = """You are a financial analyst tasked with summarizing key financial insights for {stock}.
 
@@ -39,11 +41,11 @@ Provide a **concise and structured summary** (max 400 words) covering:
 - **Avoid generic statements**; focus on specifics relevant to {messages}.
 
 ### **Available Data:**
-- **Context Data:** {context}
 - **Query:** {messages}
 
 Provide the summary in a **structured format** for readability."""
 
+# - **Context Data:** {context}
 
 recommender_prompt = """You are a financial advisor providing a recommendation for a given stock based on the given summary and the context.
 

@@ -1,7 +1,9 @@
 from langgraph.graph.message import add_messages
 
 # from langchain_core.output_parsers import StrOutputParser
-from langchain_core.prompts import ChatPromptTemplate
+#from langchain_core.messages import HumanMessage, AIMessage, ToolMessage
+from langchain_core.messages import AIMessage, ToolMessage
+from langchain_core.prompts import ChatPromptTemplate, MessagesPlaceholder
 # from langchain_community.llms import VLLMOpenAI
 from langchain_openai import ChatOpenAI
 from langchain.callbacks.streaming_stdout import StreamingStdOutCallbackHandler
@@ -34,34 +36,36 @@ class ResearchAgent:
             http_client=httpx.Client(verify=False))
 
         research_prompt = ChatPromptTemplate.from_messages([
+            #("system", prompts.system_prompt),
             ("system", prompts.researcher_prompt),
+            MessagesPlaceholder(variable_name="stock"),
             ])
         research_prompt = research_prompt.partial(
             tool_names=", ".join([tool.name for tool in tools]))
 
         if tools:
-            self.agent = research_prompt | self.llm.bind_tools(tools, strict=True, tool_choice="auto")
+            self.agent = research_prompt | self.llm.bind_tools(tools)  #, strict=True, tool_choice="auto")
         else:
             self.agent = research_prompt | self.llm
 
     def __call__(self, state: agent_states.State) -> agent_states.State:
         # Implement your custom logic here
         # Access the state and perform actions
-        message = {
+        print("Running Researcher:")
+        stock = {
             "stock": state["stock"],
-            "feedback": state.get("feedback", ""),
-            "messages": state.get("messages", []),
+            "messages": state.get("messages", "")
         }
-        response = self.agent.invoke(message)
-        print("********")
-        print(response)
-        print("********")
-        print(response.tool_calls)
-        print("********")
+        response = self.agent.invoke([str(stock)])
+
+        if isinstance(response, ToolMessage):
+            result = response
+        else:
+            result = AIMessage(**response.model_dump(exclude={"type", "name"}))
 
         messages = state.get("messages", [])
         return {
-                "messages": add_messages(messages, [response]),
+                "messages": add_messages(messages, [result]),
                 }
 
 
@@ -83,14 +87,18 @@ class SummarizationAgent:
 
         summary_prompt = ChatPromptTemplate.from_messages([
             ("system", prompts.system_prompt),
-            ("user", prompts.summary_prompt)])
+            ("user", prompts.summary_prompt),
+            MessagesPlaceholder(variable_name="messages"),
+            ])
 
         self.agent = summary_prompt | self.llm
 
     def __call__(self, state: agent_states.State) -> agent_states.State:
+        print("Running Summarizer:")
+        context = ""  # TO DO: to be obtained from vectordb
         message = {
             "stock": state["stock"],
-            "context": "",
+            "context": context,
             "messages": state.get("messages", []),
         }
         response = self.agent.invoke(message)
@@ -123,6 +131,7 @@ class RecommendationAgent:
         self.agent = recommendation_prompt | self.llm
 
     def __call__(self, state: agent_states.State) -> agent_states.State:
+        print("Running Recommender:")
         message = {
             "stock": state["stock"],
             "summary": state.get("summary", []),
