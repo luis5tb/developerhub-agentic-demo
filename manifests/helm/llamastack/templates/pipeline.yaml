@@ -27,6 +27,8 @@ spec:
           value: $(params.source-repo)
         - name: REVISION
           value: $(params.source-branch)
+        - name: SUBDIRECTORY
+          value: llama-stack
       taskRef:
         resolver: cluster
         params:
