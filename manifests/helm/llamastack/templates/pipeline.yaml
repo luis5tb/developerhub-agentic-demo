@@ -41,20 +41,12 @@ spec:
       workspaces:
         - name: output
           workspace: shared-folder
-    - name: llamastack-install
-      taskRef:
-        name: llamastack-install
-      runAfter:
-        - git-clone
-      workspaces:
-        - name: output
-          workspace: shared-folder
     {{- if $.Values.llamastackBuildConfig }}
     - name: llamastack-build-config
       taskRef:
         name: llamastack-build-config
       runAfter:
-        - llamastack-install
+        - git-clone
       workspaces:
         - name: output
           workspace: shared-folder
@@ -63,7 +55,7 @@ spec:
       taskRef:
         name: llamastack-build-template
       runAfter:
-        - llamastack-install
+        - git-clone
       workspaces:
         - name: output
           workspace: shared-folder
