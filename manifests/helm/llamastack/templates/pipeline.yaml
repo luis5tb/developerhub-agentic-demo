@@ -76,7 +76,7 @@ spec:
         - llamastack-build-template
         {{- end }}
       workspaces:
-        - name: source
-          workspace: shared-workspace
+        - name: output
+          workspace: shared-folder
   workspaces:
     - name: shared-folder
