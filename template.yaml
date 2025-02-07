@@ -246,6 +246,7 @@ spec:
           llamastack_route_enabled: ${{parameters.llamastack_route_enabled}}
           llamastack_source_repo: ${{parameters.llamastack_source_repo}}
           llamastack_build_template: ${{parameters.llamastack_build_template}}
+          llamastack_build_config: ${{parameters.llamastack_build_config}}
           model_name: ${{parameters.model_name}}
           tool_parser: ${{parameters.tool_parser}}
           hf_path: ${{parameters.hf_path}}
