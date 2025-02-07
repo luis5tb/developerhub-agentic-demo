@@ -1,0 +1,82 @@
+apiVersion: tekton.dev/v1
+kind: Pipeline
+metadata:
+  name: {{ .Values.name }}-pipeline
+  namespace: {{ $.Values.llamastackNamespace }}
+  labels:
+    type: pipeline
+    backstage.io/kubernetes-id: ${{values.component_id}}
+spec:
+  params:
+    - name: source-repo
+      description: llamastack source repo
+      type: string
+      default: {{ .Values.llamastackSource }}
+    - name: source-branch
+      description: llamastack source branch to build from
+      default: {{ .Values.llamastackSourceBranch }}
+      type: string
+    - name: output-image
+      description: reference of the image that will get created
+      default: {{ .Values.image.url }}
+      type: string
+  tasks:
+    - name: git-clone
+      params:
+        - name: URL
+          value: $(params.source-repo)
+        - name: REVISION
+          value: $(params.source-branch)
+      taskRef:
+        resolver: cluster
+        params:
+        - name: kind
+          value: task
+        - name: name
+          value: git-clone
+        - name: namespace
+          value: openshift-pipelines
+      workspaces:
+        - name: output
+          workspace: shared-folder
+    - name: llamastack-install
+      taskRef:
+        name: llamastack-install
+      runAfter:
+        - git-clone
+      workspaces:
+        - name: output
+          workspace: shared-folder
+    {{- if $.Values.llamastackBuildConfig }}
+    - name: llamastack-build-config
+      taskRef:
+        name: llamastack-build-config
+      runAfter:
+        - llamastack-install
+      workspaces:
+        - name: output
+          workspace: shared-folder
+    {{- else }}
+    - name: llamastack-build-template
+      taskRef:
+        name: llamastack-build-template
+      runAfter:
+        - llamastack-install
+      workspaces:
+        - name: output
+          workspace: shared-folder
+    {{- end }}
+    - name: create-run-configmap
+      taskRef:
+        name: create-run-configmap
+      runAfter:
+        {{- if $.Values.llamastackBuildConfig }}
+        - llamastack-build-config
+        {{- else }}
+        - llamastack-build-template
+        {{- end }}
+      workspaces:
+        - name: source
+          workspace: shared-workspace
+  workspaces:
+    - name: shared-folder

@@ -117,6 +117,80 @@ spec:
           default: latest
           type: string
           description: Image tag to use for storing in the internal registry
+    - title: Provide LlamaStack Server Information
+      required:
+        - llamastack_source_repo
+        - llamastack_route_enabled
+        - llamaserver_image_tag
+      ui:options:
+        dependencies:
+          - llamastack_build_template
+          - llamastack_build_config
+      properties:
+        llamastack_source_repo:
+          title: LLama Stack source code repo
+          type: string
+          description: Source Code repo for LlamaStack server image building
+          default: github.com:luis5tb/llama-stack.git
+        llamastack_route_enabled:
+          title: expose llamastack server via route
+          default: false
+          type: boolean
+          description: Expose the LlamaStack server via a route. Defaults to false
+        llamaserver_image_tag:
+          title: LlamaStack Image Tag
+          default: latest
+          type: string
+          description: Image tag to use for storing in the internal registry
+        llamastack_build_template:
+          title: llamastack build template
+          default: remote-vllm
+          type: string
+          description: Template use to create the llama stack build (base container)
+          enum:
+            - remote-vllm
+        llamastack_build_config:
+          title: llamastack build config
+          type: string
+          description: Insert your llamastack build config
+          ui:widget: textarea
+          ui:options:
+            rows: 10
+          ui:help: 'Hint: Add your LlamaStack Build Config here'
+          ui:placeholder: |
+            version: '2'
+            distribution_spec:
+              description: Use (an external) vLLM server for running LLM inference
+              providers:
+                inference:
+                - remote::vllm
+                vector_io:
+                - inline::faiss
+                - remote::chromadb
+                - remote::pgvector
+                safety:
+                - inline::llama-guard
+                agents:
+                - inline::meta-reference
+                eval:
+                - inline::meta-reference
+                datasetio:
+                - remote::huggingface
+                - inline::localfs
+                scoring:
+                - inline::basic
+                - inline::llm-as-judge
+                - inline::braintrust
+                telemetry:
+                - inline::meta-reference
+                tool_runtime:
+                - remote::brave-search
+                - remote::tavily-search
+                - inline::code-interpreter
+                - inline::rag-runtime
+                - remote::model-context-protocol
+              container_image: registry.access.redhat.com/ubi9
+            image_type: container
   steps:
     - id: templateSource
       name: Generating the source code component
@@ -167,6 +241,11 @@ spec:
           image_host: ${{parameters.image_host}}
           image_name: ${{parameters.namespace}}/agent-hyperscalers-app
           image_tag: ${{parameters.image_tag}}
+          llamastack_image_name: ${{parameters.namespace}}/llamastack-server-app
+          llamastack_image_tag: ${{parameters.llamaserver_image_tag}}
+          llamastack_route_enabled: ${{parameters.llamastack_route_enabled}}
+          llamastack_source_repo: ${{parameters.llamastack_source_repo}}
+          llamastack_build_template: ${{parameters.llamastack_build_template}}
           model_name: ${{parameters.model_name}}
           tool_parser: ${{parameters.tool_parser}}
           hf_path: ${{parameters.hf_path}}

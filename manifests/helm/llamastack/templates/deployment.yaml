@@ -1,0 +1,84 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ $.Values.name }}
+  namespace: {{ $.Values.llamastackNamespace}}
+  labels:
+    {{- range $key, $value := $.Values.labels }}
+    {{ $key }}: {{ $value }}
+    {{- end }}
+    {{- range $key, $value := $.Values.backstageLabels }}
+    {{ $key }}: {{ $value }}
+    {{- end }}
+    app.openshift.io/runtime: python
+spec:
+  replicas: {{ $.Values.replicaCount }}
+  selector:
+    matchLabels:
+      {{- range $key, $value := $.Values.labels }}
+      {{ $key }}: {{ $value }}
+      {{- end }}
+  template:
+    metadata:
+      {{- with $.Values.podAnnotations }}
+      annotations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      labels:
+        {{- range $key, $value := $.Values.labels }}
+        {{ $key }}: {{ $value }}
+        {{- end }}
+        {{- range $key, $value := $.Values.backstageLabels }}
+        {{ $key }}: {{ $value }}
+        {{- end }}
+    spec:
+      {{- with $.Values.imagePullSecrets }}
+      imagePullSecrets:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      containers:
+        - name: {{ $.Values.name }}-container
+          ports:
+            - containerPort: {{ $.Values.service.port }}
+              protocol: TCP
+          image: "{{ $.Values.image.repository }}:{{ $.Values.image.tag | default .Chart.AppVersion }}"
+          imagePullPolicy: {{ $.Values.image.pullPolicy }}
+          env:
+            - name: VLLM_URL
+              valueFrom:
+                secretKeyRef:
+                  name: llm-sa-secret
+                  key: endpoint
+            - name: VLLM_API_TOKEN
+              valueFrom:
+                secretKeyRef:
+                  name: llm-sa-secret
+                  key: token
+            - name: INFERENCE_MODEL
+              valueFrom:
+                secretKeyRef:
+                  name: llm-sa-secret
+                  key: model_name
+            - name: LLAMA_STACK_PORT
+              value: {{ $.Values.service.port }}
+          command: ["python", "-m", "llama_stack.distribution.server.server", "--yaml-config", "/config/run.yaml"]
+          volumeMounts:
+            - name: run-config
+              mountPath: "/config"
+              readOnly: true
+      volumes:
+        - name: run-config
+          configMap:
+            name: {{ $.Values.llamastackRunConfigMap }}
+      {{- with $.Values.nodeSelector }}
+      nodeSelector:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with $.Values.affinity }}
+      affinity:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with $.Values.tolerations }}
+      tolerations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}

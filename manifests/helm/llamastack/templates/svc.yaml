@@ -1,0 +1,20 @@
+{{- with .Values.service }}
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ $.Values.name }}-svc
+  namespace: {{ $.Values.llamastackNamespace}}
+  labels:
+    {{- range $key, $value := $.Values.backstageLabels }}
+    {{ $key }}: {{ $value }}
+    {{- end }}     
+spec:
+  type: {{ .type }}
+  ports:
+    - port: {{ .port }}
+      protocol: TCP
+  selector:
+    {{- range $key, $value := $.Values.labels }}
+    {{ $key }}: {{ $value }}
+    {{- end }} 
+{{- end }}

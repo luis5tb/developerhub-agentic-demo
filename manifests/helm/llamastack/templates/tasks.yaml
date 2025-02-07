@@ -1,0 +1,112 @@
+apiVersion: tekton.dev/v1
+kind: Task
+metadata:
+  name: llamastack-install
+  namespace: {{ $.Values.llamastackNamespace }}
+spec:
+  steps:
+    - name: install
+      image: registry.access.redhat.com/ubi9/ubi:latest
+      script: |
+        #!/bin/sh
+        yum install -y python-pip
+        python -m venv stack
+        source stack/bin/activate
+        cd /workspaces/output/llama-stack
+        pip install .
+  workspaces:
+    - name: output
+      description: Workspace to place the cloned repository
+---
+apiVersion: tekton.dev/v1
+kind: Task
+metadata:
+  name: llamastack-build-config
+  namespace: {{ $.Values.llamastackNamespace }}
+spec:
+  steps:
+    - name: build-config
+      image: registry.access.redhat.com/ubi9/ubi:latest
+      script: |
+        #!/bin/sh
+        source stack/bin/activate
+        export CONTAINER_BINARY=podman
+        export LLAMA_STACK_DIR="/workspaces/output/llama-stack"
+        export USE_COPY_NOT_MOUNT="true"
+
+        llama stack build --config /config/build.yaml --image-type container --image-name {{ $.Values.llamastack_image_name }}
+
+        cp -r ~/.llama/distributions/{{ $.Values.llamastack_image_name }} /workspace/output/
+      volumeMounts:
+        - name: build-config
+          mountPath: "/config"
+          readOnly: true
+    - name: push-image
+      image: registry.access.redhat.com/ubi9/buildah:latest
+      script: |
+        #!/bin/sh
+        buildah tag localhost/{{ $.Values.llamastack_image_name }}:dev {{ $.Values.image.url }}
+        buildah push {{ $.Values.image.url }}
+  workspaces:
+    - name: output
+      description: Workspace to place the build/run config files
+  volumes:
+    - name: build-config
+      configMap:
+        name: {{ $.Values.llamastackBuildConfigMap }}
+---
+apiVersion: tekton.dev/v1
+kind: Task
+metadata:
+  name: llamastack-build-template
+  namespace: {{ $.Values.llamastackNamespace }}
+spec:
+  steps:
+    - name: build-template
+      image: registry.access.redhat.com/ubi9/ubi:latest
+      script: |
+        #!/bin/sh
+        source stack/bin/activate
+        export CONTAINER_BINARY=podman
+        export LLAMA_STACK_DIR="/workspaces/output/llama-stack"
+        export USE_COPY_NOT_MOUNT="true"
+
+        cp /workspaces/output/llama-stack/llama_stack/templates/remote-vllm/build.yaml build.yaml
+        grep -q '^  container_image:' build.yaml && sed -i 's|^\( *container_image:\).*|\1 registry.access.redhat.com/ubi9|' build.yaml || sed -i '/^distribution_spec:/a\  container_image: blablabla' filename.yaml grep -q '^  container_image:' filename.yaml && sed -i 's|^\( *container_image:\).*|\1 registry.access.redhat.com/ubi9|' build.yaml || sed -i '/^distribution_spec:/a\  container_image: registry.access.redhat.com/ubi9' build.yaml 
+
+        llama stack build --config ./build.yaml --image-type container --image-name {{ $.Values.llamastack_image_name }}
+
+        cp -r ~/.llama/distributions/{{ $.Values.llamastack_image_name }} /workspace/output/
+    - name: push-image
+      image: registry.access.redhat.com/ubi9/buildah:latest
+      script: |
+        #!/bin/sh
+        buildah tag localhost/{{ $.Values.llamastack_image_name }}:dev {{ $.Values.image.url }}
+        buildah push {{ $.Values.image.url }}
+  workspaces:
+    - name: output
+      description: Workspace to place the build/run config files
+---
+apiVersion: tekton.dev/v1
+kind: Task
+metadata:
+  name: create-run-configmap
+  namespace: {{ $.Values.llamastackNamespace }}
+spec:
+  steps:
+    - name: create-configmap
+      image: registry.access.redhat.com/ubi9/ubi:latest
+      script: |
+        #!/bin/sh
+        # Install kubectl on UBI9 image
+        yum install -y curl && \
+        curl -LO https://dl.k8s.io/release/v1.24.0/bin/linux/amd64/kubectl && \
+        chmod +x kubectl && \
+        mv kubectl /usr/local/bin/
+
+        # Create configmap
+        kubectl create configmap {{ $.Values.llamastackRunConfigMap }} --from-file=run.yaml=/workspace/output/{{ $.Values.llamastack_image_name }}/{{ $.Values.llamastack_image_name }}-run.yaml --dry-run=client -o yaml | kubectl apply -f -
+        echo "ConfigMap created/updated successfully!"
+  workspaces:
+    - name: output
+      description: Workspace with the config files

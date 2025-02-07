@@ -1,0 +1,53 @@
+---
+name: llamastack-server
+llamastackNamespace: llamastack-${{values.namespace}}
+
+modelName: ${{values.model_name}}
+vllmNamespace: vllm-${{values.namespace}}
+cluster_app: ${{values.cluster}}
+saName: model-default
+
+labels:
+  app: llamastack-server-app
+
+replicaCount: 1
+podAnnotations: {}
+imagePullSecrets: []
+nodeSelector: {}
+tolerations: []
+affinity: {}
+image:
+  repository: ${{values.image_host}}/${{values.llamastack_image_name}}
+  pullPolicy: Always
+  # Overrides the image tag whose default is the chart appVersion.
+  tag: ${{values.llamastack_image_tag}}
+  url: ${{values.image_host}}/${{values.llamastack_image_name}}:${{values.llamastack_image_tag}}
+
+service:
+  type: ClusterIP
+  port: 5001
+  name: http
+  labels:
+    app: llamastack-server-app
+
+route:
+  enabled: ${{values.llamastack_route_enabled}}
+  #host: chart-example.local
+  path: /
+  labels:
+    app: agent-app
+
+backstageLabels:
+  backstage.io/kubernetes-id: ${{values.component_id}}
+
+secretStore:
+  name: vault-backend
+  kind: ClusterSecretStore
+
+llamastackSource: ${{values.llamastack_source_repo}}
+llamastackSourceBranch: test-vllm  # to be replaced with main
+llamastackBuildTemplate: ${{values.llamastack_build_template}}
+llamastackBuildConfig: ${{values.llamastack_build_config}}
+llamastackBuildConfigMap: llamastack-build-cm
+llamastackRunConfigMap: llamastack-run-cm
+

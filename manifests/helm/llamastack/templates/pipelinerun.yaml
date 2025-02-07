@@ -1,0 +1,24 @@
+apiVersion: tekton.dev/v1
+kind: PipelineRun
+metadata:
+  name: {{ .Values.name }}-pipelinerun
+  namespace: {{ $.Values.llamastackNamespace }}
+  labels:
+    backstage.io/kubernetes-id: ${{values.component_id}}
+    tekton.dev/pipeline: {{ .Values.name }}-pipeline
+spec:
+  pipelineRef:
+    name: {{ .Values.name }}-pipeline
+  taskRunTemplate:
+    serviceAccountName: pipeline
+  timeouts:
+    pipeline: 1h0m0s
+  workspaces:
+  - name: shared-folder
+    volumeClaimTemplate:
+      spec:
+        accessModes:
+        - ReadWriteOnce
+        resources:
+          requests:
+            storage: 1Gi
