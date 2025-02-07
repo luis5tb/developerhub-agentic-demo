@@ -131,7 +131,7 @@ spec:
           title: LLama Stack source code repo
           type: string
           description: Source Code repo for LlamaStack server image building
-          default: github.com:luis5tb/llama-stack.git
+          default: https://github.com/luis5tb/llama-stack.git
         llamastack_route_enabled:
           title: expose llamastack server via route
           default: false
