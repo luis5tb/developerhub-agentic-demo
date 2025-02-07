@@ -11,7 +11,7 @@ spec:
         #!/bin/sh
         yum install -y python-pip
         pip install uv
-        cd /workspaces/output/llama-stack/
+        cd /workspace/output/llama-stack/
         uv sync --extra dev
         uv pip install -e .
         source .venv/bin/activate
@@ -31,10 +31,10 @@ spec:
       script: |
         #!/bin/sh
         yum install -y podman
-        cd /workspaces/output/llama-stack/
+        cd /workspace/output/llama-stack/
         source .venv/bin/activate
         export CONTAINER_BINARY=podman
-        export LLAMA_STACK_DIR="/workspaces/output/llama-stack"
+        export LLAMA_STACK_DIR="/workspace/output/llama-stack"
         export USE_COPY_NOT_MOUNT="true"
 
         llama stack build --config /config/build.yaml --image-type container --image-name {{ $.Values.llamastack_image_name }}
@@ -70,13 +70,13 @@ spec:
       script: |
         #!/bin/sh
         yum install -y podman
-        cd /workspaces/output/llama-stack/
+        cd /workspace/output/llama-stack/
         source .venv/bin/activate
         export CONTAINER_BINARY=podman
-        export LLAMA_STACK_DIR="/workspaces/output/llama-stack"
+        export LLAMA_STACK_DIR="/workspace/output/llama-stack"
         export USE_COPY_NOT_MOUNT="true"
 
-        cp /workspaces/output/llama-stack/llama_stack/templates/remote-vllm/build.yaml build.yaml
+        cp /workspace/output/llama-stack/llama_stack/templates/remote-vllm/build.yaml build.yaml
         grep -q '^  container_image:' build.yaml && sed -i 's|^\( *container_image:\).*|\1 registry.access.redhat.com/ubi9|' build.yaml || sed -i '/^distribution_spec:/a\  container_image: blablabla' filename.yaml grep -q '^  container_image:' filename.yaml && sed -i 's|^\( *container_image:\).*|\1 registry.access.redhat.com/ubi9|' build.yaml || sed -i '/^distribution_spec:/a\  container_image: registry.access.redhat.com/ubi9' build.yaml
         sed -i 's/^image_type: .*/image_type: container/' build.yaml
 
