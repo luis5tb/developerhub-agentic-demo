@@ -9,7 +9,7 @@ spec:
     - name: image-name
       description: container image name
       type: string
-      default: {{ $.Values.llamastack_image_name }}
+      default: {{ $.Values.image.name }}
     - name: image-tag
       description: container image tag
       type: string
