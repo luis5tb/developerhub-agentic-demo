@@ -6,5 +6,5 @@ metadata:
   namespace: {{ $.Values.llamastackNamespace }}
 data:
   build.yaml: |-
-    {{ $.Values.llamastackBuildConfig | b64dec | indent 4 }}
+    {{ $.Values.llamastackBuildConfig | b64enc | indent 4 }}
 {{- end }}

@@ -30,7 +30,9 @@ spec:
         export LLAMA_STACK_DIR="/workspace/output/llama-stack"
         export USE_COPY_NOT_MOUNT="true"
 
-        llama stack build --config /config/build.yaml --image-type container --image-name $(params.image-name)
+        base64 -d /config/build.yaml > ./build.yaml
+
+        llama stack build --config ./build.yaml --image-type container --image-name $(params.image-name)
 
         cp -r ~/.llama/distributions/$(params.image-name) /workspace/output/
       volumeMounts:
