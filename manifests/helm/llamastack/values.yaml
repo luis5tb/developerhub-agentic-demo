@@ -51,3 +51,5 @@ llamastackBuildTemplate: ${{values.llamastack_build_template}}
 llamastackBuildConfig: "${{values.llamastack_build_config}}"
 llamastackBuildConfigMap: llamastack-build-cm
 llamastackRunConfigMap: llamastack-run-cm
+
+pipelineSA: tekton-sa

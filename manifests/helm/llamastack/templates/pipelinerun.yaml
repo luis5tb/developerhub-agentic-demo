@@ -9,8 +9,11 @@ metadata:
 spec:
   pipelineRef:
     name: {{ .Values.name }}-pipeline
-  taskRunTemplate:
-    serviceAccountName: pipeline
+  taskRunSpecs:
+    - pipelineTaskName: llamastack-build-config
+      serviceAccountName: {{ .Values.pipelineSA }}
+    - pipelineTaskName: llamastack-build-template
+      serviceAccountName: {{ .Values.pipelineSA }}
   timeouts:
     pipeline: 1h0m0s
   workspaces:

@@ -17,6 +17,8 @@ spec:
   steps:
     - name: build-config
       image: registry.access.redhat.com/ubi9/ubi:latest
+      securityContext:
+        privileged: true
       script: |
         #!/bin/sh
         yum install -y python-pip podman
@@ -71,6 +73,8 @@ spec:
   steps:
     - name: build-template
       image: registry.access.redhat.com/ubi9/ubi:latest
+      securityContext:
+        privileged: true
       script: |
         #!/bin/sh
         yum install -y python-pip podman

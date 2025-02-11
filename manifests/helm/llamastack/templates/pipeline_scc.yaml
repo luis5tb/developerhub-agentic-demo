@@ -1,0 +1,19 @@
+apiVersion: security.openshift.io/v1
+kind: SecurityContextConstraints
+metadata:
+  name: {{ $.Values.pipelineSA }}
+  namespace: {{ $.Values.llamastackNamespace}}
+allowPrivilegedContainer: true
+allowedCapabilities:
+- "*"
+runAsUser:
+  type: RunAsAny
+seLinuxContext:
+  type: MustRunAs
+fsGroup:
+  type: RunAsAny
+supplementalGroups:
+  type: RunAsAny
+users:
+- system:serviceaccount:{{ $.Values.llamastackNamespace }}:{{ $.Values.pipelineSA }}
+groups: []
