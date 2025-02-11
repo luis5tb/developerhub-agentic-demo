@@ -10,10 +10,13 @@ spec:
   pipelineRef:
     name: {{ .Values.name }}-pipeline
   taskRunSpecs:
+    {{- if $.Values.llamastackBuildConfig }}
     - pipelineTaskName: llamastack-build-config
       serviceAccountName: {{ .Values.pipelineSA }}
+    {{- else }}
     - pipelineTaskName: llamastack-build-template
       serviceAccountName: {{ .Values.pipelineSA }}
+    {{- end }}
   timeouts:
     pipeline: 1h0m0s
   workspaces:
