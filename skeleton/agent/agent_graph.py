@@ -12,6 +12,7 @@ from guardrails import apply_guardrails
 
 from tools import get_tools
 import agents
+import llamastack_agents
 import agent_states
 
 
@@ -29,9 +30,13 @@ class AgentGraph:
         tools = get_tools()
         self.tools_node = ToolNode(tools)
 
-        self.researcher_node = agents.ResearchAgent(
-            llm_endpoint=llm_endpoint,
-            llm_token=llm_token,
+        # self.researcher_node = agents.ResearchAgent(
+        #     llm_endpoint=llm_endpoint,
+        #     llm_token=llm_token,
+        #     model_name=model_name,
+        #     tools=tools)
+        self.researcher_node = llamastack_agents.LlamaStackResearchAgent(
+            llamastack_server_endpoint="http://llamastack-server.llamastack-agent-ns.svc.cluster.local:5001",
             model_name=model_name,
             tools=tools)
 
