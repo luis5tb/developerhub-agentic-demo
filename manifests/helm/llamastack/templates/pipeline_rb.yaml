@@ -1,0 +1,37 @@
+# apiVersion: rbac.authorization.k8s.io/v1
+# kind: Role
+# metadata:
+#   name: custom-image-pusher
+#   namespace: {{ $.Values.llamastackNamespace}}
+# rules:
+#   - apiGroups: ["image.openshift.io"]
+#     resources: ["imagestreams/layers"]
+#     verbs: ["create", "update", "get"]
+# ---
+# apiVersion: rbac.authorization.k8s.io/v1
+# kind: RoleBinding
+# metadata:
+#   name: {{ $.Values.pipelineSA }}-image-builder-binding
+#   namespace: {{ $.Values.llamastackNamespace}}
+# subjects:
+#   - kind: ServiceAccount
+#     name: {{ $.Values.pipelineSA }}
+#     namespace: {{ $.Values.llamastackNamespace}}
+# roleRef:
+#   kind: ClusterRole
+#   name: system:image-builder
+#   apiGroup: rbac.authorization.k8s.io
+# ---
+# apiVersion: rbac.authorization.k8s.io/v1
+# kind: RoleBinding
+# metadata:
+#   name: {{ $.Values.pipelineSA }}-image-pusher-binding
+#   namespace: {{ $.Values.llamastackNamespace}}
+# subjects:
+#   - kind: ServiceAccount
+#     name: {{ $.Values.pipelineSA }}
+#     namespace: {{ $.Values.llamastackNamespace}}
+# roleRef:
+#   kind: Role
+#   name: custom-image-pusher
+#   apiGroup: rbac.authorization.k8s.io

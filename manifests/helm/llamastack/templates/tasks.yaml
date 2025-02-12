@@ -10,7 +10,7 @@ spec:
       description: container image name
       type: string
       default: {{ $.Values.image.name }}
-    - name: image-tag
+    - name: image-url
       description: container image tag
       type: string
       default: {{ $.Values.image.url }}
@@ -45,7 +45,7 @@ spec:
         cp -r ~/.llama/distributions/$(params.image-name) /workspace/output/
 
         podman tag localhost/$(params.image-name):dev $(params.image-url)
-        podman push $(params.image-url)
+        podman push --tls-verify=false $(params.image-url)
       volumeMounts:
         - name: build-config
           mountPath: "/config"
@@ -106,7 +106,7 @@ spec:
         cp -r ~/.llama/distributions/$(params.image-name) /workspace/output/
 
         podman tag localhost/$(params.image-name):dev $(params.image-url)
-        podman push $(params.image-url)
+        podman push --tls-verify=false $(params.image-url)
   workspaces:
     - name: output
       description: Workspace to place the build/run config files
@@ -117,19 +117,26 @@ metadata:
   name: create-run-configmap
   namespace: {{ $.Values.llamastackNamespace }}
 spec:
+  params:
+    - name: run-config
+      description: run config folder
+      type: string
+      default: {{ $.Values.image.name }}
   steps:
     - name: create-configmap
       image: registry.access.redhat.com/ubi9/ubi:latest
       script: |
         #!/bin/sh
         # Install kubectl on UBI9 image
-        yum install -y curl && \
-        curl -LO https://dl.k8s.io/release/v1.24.0/bin/linux/amd64/kubectl && \
-        chmod +x kubectl && \
+        #yum install -y curl
+
+        curl -LO https://dl.k8s.io/release/v1.24.0/bin/linux/amd64/kubectl
+
+        chmod +x kubectl
         mv kubectl /usr/local/bin/
 
         # Create configmap
-        kubectl create configmap {{ $.Values.llamastackRunConfigMap }} --from-file=run.yaml=/workspace/output/{{ $.Values.llamastack_image_name }}/{{ $.Values.llamastack_image_name }}-run.yaml --dry-run=client -o yaml | kubectl apply -f -
+        kubectl create configmap {{ $.Values.llamastackRunConfigMap }} --from-file=run.yaml=/workspace/output/$(params.run-config)/$(params.run-config)-run.yaml --dry-run=client -o yaml | kubectl apply -f -
         echo "ConfigMap created/updated successfully!"
   workspaces:
     - name: output
