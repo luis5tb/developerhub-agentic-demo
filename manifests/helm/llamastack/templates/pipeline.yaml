@@ -21,7 +21,7 @@ spec:
       default: {{ .Values.image.url }}
       type: string
   tasks:
-    - name: git-clone
+    - name: git-clone-llamastack
       params:
         - name: URL
           value: $(params.source-repo)
@@ -41,12 +41,33 @@ spec:
       workspaces:
         - name: output
           workspace: shared-folder
+    - name: git-clone-llamamodels
+      params:
+        - name: URL
+          value: https://github.com/meta-llama/llama-models.git
+        - name: REVISION
+          value: main
+        - name: SUBDIRECTORY
+          value: llama-models
+      taskRef:
+        resolver: cluster
+        params:
+        - name: kind
+          value: task
+        - name: name
+          value: git-clone
+        - name: namespace
+          value: openshift-pipelines
+      workspaces:
+        - name: output
+          workspace: shared-folder
     {{- if $.Values.llamastackBuildConfig }}
     - name: llamastack-build-config
       taskRef:
         name: llamastack-build-config
       runAfter:
-        - git-clone
+        - git-clone-llamastack
+        - git-clone-llamamodels
       workspaces:
         - name: output
           workspace: shared-folder
@@ -55,7 +76,8 @@ spec:
       taskRef:
         name: llamastack-build-template
       runAfter:
-        - git-clone
+        - git-clone-llamastack
+        - git-clone-llamamodels
       workspaces:
         - name: output
           workspace: shared-folder

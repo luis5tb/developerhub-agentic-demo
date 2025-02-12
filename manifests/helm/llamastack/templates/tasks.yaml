@@ -24,15 +24,19 @@ spec:
         set -x
         yum install -y python-pip podman
         pip install uv
-        cd /workspace/output/llama-stack/
+
+        cd /workspace/output/llama-stack
         uv sync --extra dev
         uv pip install -e .
 
         source .venv/bin/activate
-        pip install chardet pypdf mcp
+        uv pip install chardet pypdf jq mcp
+
+        cd /workspace/output/
         export CONTAINER_BINARY=podman
-        export LLAMA_STACK_DIR="."
+        export LLAMA_STACK_DIR="./llama-stack"
         export USE_COPY_NOT_MOUNT="true"
+        export LLAMA_MODELS_DIR="./llama-models"
 
         base64 -d /config/build.yaml > ./build.yaml
 
@@ -82,18 +86,22 @@ spec:
         set -x
         yum install -y python-pip podman
         pip install uv
+
         cd /workspace/output/llama-stack/
         uv sync --extra dev
         uv pip install -e .
 
         source .venv/bin/activate
-        pip install chardet pypdf mcp
+        uv pip install chardet pypdf jq mcp
+
+        cd /workspace/output/
         export CONTAINER_BINARY=podman
-        export LLAMA_STACK_DIR="."
+        export LLAMA_STACK_DIR="./llama-stack"
         export USE_COPY_NOT_MOUNT="true"
+        export LLAMA_MODELS_DIR="./llama-models"
 
         cp /workspace/output/llama-stack/llama_stack/templates/remote-vllm/build.yaml build.yaml
-        grep -q '^  container_image:' build.yaml && sed -i 's|^\( *container_image:\).*|\1 registry.access.redhat.com/ubi9|' build.yaml || sed -i '/^distribution_spec:/a\  container_image: blablabla' filename.yaml grep -q '^  container_image:' filename.yaml && sed -i 's|^\( *container_image:\).*|\1 registry.access.redhat.com/ubi9|' build.yaml || sed -i '/^distribution_spec:/a\  container_image: registry.access.redhat.com/ubi9' build.yaml
+        grep -q '^  container_image:' build.yaml && sed -i 's|^\( *container_image:\).*|\1 registry.access.redhat.com/ubi9|' build.yaml || sed -i '/^distribution_spec:/a\  container_image: registry.access.redhat.com/ubi9' filename.yaml grep -q '^  container_image:' filename.yaml && sed -i 's|^\( *container_image:\).*|\1 registry.access.redhat.com/ubi9|' build.yaml || sed -i '/^distribution_spec:/a\  container_image: registry.access.redhat.com/ubi9' build.yaml
         sed -i 's/^image_type: .*/image_type: container/' build.yaml
 
         llama stack build --config ./build.yaml --image-type container --image-name  $(params.image-name)
