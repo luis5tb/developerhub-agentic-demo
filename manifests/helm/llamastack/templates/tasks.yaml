@@ -21,6 +21,7 @@ spec:
         privileged: true
       script: |
         #!/bin/sh
+        set -x
         yum install -y python-pip podman
         pip install uv
         cd /workspace/output/llama-stack/
@@ -28,8 +29,9 @@ spec:
         uv pip install -e .
 
         source .venv/bin/activate
+        pip install chardet pypdf mcp
         export CONTAINER_BINARY=podman
-        export LLAMA_STACK_DIR="/workspace/output/llama-stack"
+        export LLAMA_STACK_DIR="."
         export USE_COPY_NOT_MOUNT="true"
 
         base64 -d /config/build.yaml > ./build.yaml
@@ -77,6 +79,7 @@ spec:
         privileged: true
       script: |
         #!/bin/sh
+        set -x
         yum install -y python-pip podman
         pip install uv
         cd /workspace/output/llama-stack/
@@ -84,8 +87,9 @@ spec:
         uv pip install -e .
 
         source .venv/bin/activate
+        pip install chardet pypdf mcp
         export CONTAINER_BINARY=podman
-        export LLAMA_STACK_DIR="/workspace/output/llama-stack"
+        export LLAMA_STACK_DIR="."
         export USE_COPY_NOT_MOUNT="true"
 
         cp /workspace/output/llama-stack/llama_stack/templates/remote-vllm/build.yaml build.yaml
