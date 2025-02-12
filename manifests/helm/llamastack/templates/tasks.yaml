@@ -43,16 +43,13 @@ spec:
         llama stack build --config ./build.yaml --image-type container --image-name $(params.image-name)
 
         cp -r ~/.llama/distributions/$(params.image-name) /workspace/output/
+
+        podman tag localhost/$(params.image-name):dev $(params.image-url)
+        podman push $(params.image-url)
       volumeMounts:
         - name: build-config
           mountPath: "/config"
           readOnly: true
-    - name: push-image
-      image: registry.access.redhat.com/ubi9/buildah:latest
-      script: |
-        #!/bin/sh
-        buildah tag localhost/$(params.image-name):dev $(params.image-tag)
-        buildah push $(params.image-tag)
   workspaces:
     - name: output
       description: Workspace to place the build/run config files
@@ -72,8 +69,8 @@ spec:
       description: container image name
       type: string
       default: {{ $.Values.image.name }}
-    - name: image-tag
-      description: container image tag
+    - name: image-url
+      description: container image url
       type: string
       default: {{ $.Values.image.url }}
   steps:
@@ -107,12 +104,9 @@ spec:
         llama stack build --config ./build.yaml --image-type container --image-name  $(params.image-name)
 
         cp -r ~/.llama/distributions/$(params.image-name) /workspace/output/
-    - name: push-image
-      image: registry.access.redhat.com/ubi9/buildah:latest
-      script: |
-        #!/bin/sh
-        buildah tag localhost/$(params.image-name):dev $(params.image-tag)
-        buildah push $(params.image-tag)
+
+        podman tag localhost/$(params.image-name):dev $(params.image-url)
+        podman push $(params.image-url)
   workspaces:
     - name: output
       description: Workspace to place the build/run config files

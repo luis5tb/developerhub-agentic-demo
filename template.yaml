@@ -241,7 +241,7 @@ spec:
           image_host: ${{parameters.image_host}}
           image_name: ${{parameters.namespace}}/agent-hyperscalers-app
           image_tag: ${{parameters.image_tag}}
-          llamastack_image_name: ${{parameters.namespace}}-llamastack-server
+          llamastack_image_name: llamastack-server
           llamastack_image_tag: ${{parameters.llamaserver_image_tag}}
           llamastack_route_enabled: ${{parameters.llamastack_route_enabled}}
           llamastack_source_repo: ${{parameters.llamastack_source_repo}}

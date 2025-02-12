@@ -17,12 +17,12 @@ nodeSelector: {}
 tolerations: []
 affinity: {}
 image:
-  repository: ${{values.image_host}}/${{values.llamastack_image_name}}
+  repository: ${{values.image_host}}/${{values.namespace}}/${{values.llamastack_image_name}}
   name: ${{values.llamastack_image_name}}
   pullPolicy: Always
   # Overrides the image tag whose default is the chart appVersion.
   tag: ${{values.llamastack_image_tag}}
-  url: ${{values.image_host}}/${{values.llamastack_image_name}}:${{values.llamastack_image_tag}}
+  url: ${{values.image_host}}/${{values.namespace}}/${{values.llamastack_image_name}}:${{values.llamastack_image_tag}}
 
 service:
   type: ClusterIP
