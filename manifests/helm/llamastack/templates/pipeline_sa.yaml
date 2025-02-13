@@ -3,12 +3,12 @@ kind: ServiceAccount
 metadata:
   name: {{ $.Values.pipelineSA }}
   namespace: {{ $.Values.llamastackNamespace}}
-# ---
-# apiVersion: v1
-# kind: Secret
-# metadata:
-#   name: {{ $.Values.pipelineSA }}-token
-#   annotations:
-#     kubernetes.io/service-account.name: {{ $.Values.pipelineSA }}
-#   namespace: {{ $.Values.llamastackNamespace}}
-# type: kubernetes.io/service-account-token
+---
+apiVersion: v1
+kind: Secret
+metadata:
+  name: {{ $.Values.pipelineSA }}-token
+  annotations:
+    kubernetes.io/service-account.name: {{ $.Values.pipelineSA }}
+  namespace: {{ $.Values.llamastackNamespace}}
+type: kubernetes.io/service-account-token
