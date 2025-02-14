@@ -38,7 +38,9 @@ spec:
         export USE_COPY_NOT_MOUNT="true"
         export LLAMA_MODELS_DIR="./llama-models"
 
-        base64 -d /config/build.yaml > ./build.yaml
+        base64 -d /config/build.json > ./build.json
+
+        python3 -c 'import sys, yaml, json; yaml.safe_dump(json.load(open("./build.json")), sys.stdout)' > ./build.yaml
 
         llama stack build --config ./build.yaml --image-type container --image-name $(params.image-name)
 

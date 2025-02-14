@@ -158,39 +158,49 @@ spec:
             rows: 10
           ui:help: 'Hint: Add your LlamaStack Build Config here'
           ui:placeholder: |
-            version: '2'
-            distribution_spec:
-              description: Use (an external) vLLM server for running LLM inference
-              providers:
-                inference:
-                - remote::vllm
-                vector_io:
-                - inline::faiss
-                - remote::chromadb
-                - remote::pgvector
-                safety:
-                - inline::llama-guard
-                agents:
-                - inline::meta-reference
-                eval:
-                - inline::meta-reference
-                datasetio:
-                - remote::huggingface
-                - inline::localfs
-                scoring:
-                - inline::basic
-                - inline::llm-as-judge
-                - inline::braintrust
-                telemetry:
-                - inline::meta-reference
-                tool_runtime:
-                - remote::brave-search
-                - remote::tavily-search
-                - inline::code-interpreter
-                - inline::rag-runtime
-                - remote::model-context-protocol
-              container_image: registry.access.redhat.com/ubi9
-            image_type: container
+            {
+              "version": "2",
+              "distribution_spec": {
+                "description": "Use (an external) vLLM server for running LLM inference",
+                "providers": {
+                  "inference": [
+                    "remote::vllm"
+                  ],
+                  "vector_io": [
+                    "inline::faiss",
+                    "remote::chromadb"
+                  ],
+                  "safety": [
+                    "inline::llama-guard",
+                  ],
+                  "agents": [
+                    "inline::meta-reference"
+                  ],
+                  "eval": [
+                    "inline::meta-reference"
+                  ],
+                  "datasetio": [
+                    "remote::huggingface",
+                    "inline::localfs"
+                  ],
+                  "scoring": [
+                    "inline::basic",
+                    "inline::llm-as-judge",
+                    "inline::braintrust"
+                  ],
+                  "telemetry": [
+                    "inline::meta-reference"
+                  ],
+                  "tool_runtime": [
+                    "remote::tavily-search",
+                    "inline::code-interpreter",
+                    "inline::rag-runtime",
+                  ]
+                },
+                "container_image": "registry.access.redhat.com/ubi9"
+              },
+              "image_type": "container"
+            }
   steps:
     - id: templateSource
       name: Generating the source code component
