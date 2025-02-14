@@ -5,6 +5,6 @@ metadata:
   name: {{ $.Values.llamastackBuildConfigMap }}
   namespace: {{ $.Values.llamastackNamespace }}
 data:
-  build.yaml: |-
+  build.json: |-
     {{ $.Values.llamastackBuildConfig | b64enc | indent 4 }}
 {{- end }}
