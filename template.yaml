@@ -155,7 +155,7 @@ spec:
           description: Insert your llamastack build config
           ui:widget: textarea
           ui:options:
-            rows: 10
+            rows: 30
           ui:help: 'Hint: Add your LlamaStack Build Config here'
           ui:placeholder: |
             {

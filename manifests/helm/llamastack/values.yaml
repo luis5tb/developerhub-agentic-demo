@@ -48,7 +48,7 @@ secretStore:
 llamastackSource: ${{values.llamastack_source_repo}}
 llamastackSourceBranch: test-vllm  # to be replaced with main
 llamastackBuildTemplate: ${{values.llamastack_build_template}}
-llamastackBuildConfig: "${{values.llamastack_build_config}}"
+llamastackBuildConfig: '${{values.llamastack_build_config}}'
 llamastackBuildConfigMap: llamastack-build-cm
 llamastackRunConfigMap: llamastack-run-cm
 
