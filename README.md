@@ -4,8 +4,9 @@ First you need an OpenShift cluster with the required dependencies, it can be in
 https://github.com/luis5tb/multicloud-gitops/tree/rhdh-demo (note the `rhdh-demo` branch):
 
 ```bash
-$ git clone https://github.com/luis5tb/multicloud-gitops/tree/rhdh-demo
+$ git clone https://github.com/luis5tb/multicloud-gitops
 $ cd multicloud-gitops
+$ git checkout rhdh-demo 
 
 # Adjust secrets as needed
 $ cat values-secret.yaml.template
@@ -56,13 +57,13 @@ $  cp values-secret.yaml.template ~/.config/hybrid-cloud-patterns/values-secret-
 $  ./pattern.sh make load-secrets
 ```
 
-The template will be automatically imported, but you can clone it, modify it and then import the template into your deployed Red Hat Developer Hub and instantiate it. It will create
-- gitops repo with the resources being created
-- git repo with the code for the agent
-- argocd applications to deploy:
-  - Building pipeline for the agent image
+The template will be automatically imported, but you can clone it, modify it and then import the template into your deployed Red Hat Developer Hub and instantiate it. It will create two repositories in your Git account:
+- git repo with the source code for the agent
+- gitops repo with the resources being created using helm and argocd applications for deploying the demo resources: 
+  - Build pipeline for the agent image
   - LLM at OpenShift AI
   - Agent at OpenShift
+  - TrustyAI evaluation job at OpenShift AI
 
 
 ## How to enable RHDH GitHub Authentication (GH Access token, cliend_id and client_secret)
