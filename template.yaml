@@ -8,8 +8,9 @@ metadata:
     - python
     - genai
     - datascience
-    - langgraph
+    - llamastack
     - hyperscalers
+    - trustyai
 spec:
   owner: luis5tb
   type: service
