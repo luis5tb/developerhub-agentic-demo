@@ -1,0 +1,46 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: chroma-deployment
+  namespace: {{ $.Values.llamastackNamespace}}
+  labels:
+    {{- range $key, $value := $.Values.backstageLabels }}
+    {{ $key }}: {{ $value }}
+    {{- end }}
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: chroma
+  template:
+    metadata:
+      labels:
+        app: chroma
+    spec:
+      containers:
+      - name: chroma
+        image: "{{ $.Values.chromaImage.repository }}"
+        imagePullPolicy: Always
+        ports:
+        - containerPort: 8000
+        resources:
+          requests:
+            cpu: "500m"
+            memory: "512Mi"
+          limits:
+            cpu: "1"
+            memory: "1Gi"
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: chroma-service
+  namespace: {{ $.Values.llamastackNamespace}}
+spec:
+  selector:
+    app: chroma
+  ports:
+    - protocol: TCP
+      port: 8000
+      targetPort: 8000
+  type: ClusterIP

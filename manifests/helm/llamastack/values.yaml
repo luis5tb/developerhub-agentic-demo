@@ -53,3 +53,6 @@ llamastackBuildConfigMap: llamastack-build-cm
 llamastackRunConfigMap: llamastack-run-cm
 
 pipelineSA: tekton-sa
+
+chromaImage:
+  repository: ${{values.image_host}}/llamastack-${{values.namespace}}/chromadb:latest

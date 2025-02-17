@@ -20,6 +20,10 @@ spec:
       description: reference of the image that will get created
       default: {{ .Values.image.url }}
       type: string
+    - name: chromadb-image
+      description: reference of the image that will get created
+      default: {{ .Values.chromaImage.repository }}
+      type: string
   tasks:
     - name: git-clone-llamastack
       params:
@@ -60,6 +64,46 @@ spec:
           value: openshift-pipelines
       workspaces:
         - name: output
+          workspace: shared-folder
+    - name: git-clone-chroma
+      params:
+        - name: URL
+          value: ${{values.source_repository}}
+        - name: REVISION
+          value: main
+        - name: SUBDIRECTORY
+          value: template
+      taskRef:
+        resolver: cluster
+        params:
+        - name: kind
+          value: task
+        - name: name
+          value: git-clone
+        - name: namespace
+          value: openshift-pipelines
+      workspaces:
+        - name: output
+          workspace: shared-folder
+    - name: buildah-chroma
+      params:
+        - name: IMAGE
+          value: $(params.chromadb-image)
+        - name: DOCKERFILE
+          value: template/skeleton/chromaDockerfile
+      runAfter:
+        - git-clone-chroma
+      taskRef:
+        resolver: cluster
+        params:
+        - name: kind
+          value: task
+        - name: name
+          value: buildah
+        - name: namespace
+          value: openshift-pipelines
+      workspaces:
+        - name: source
           workspace: shared-folder
     {{- if $.Values.llamastackBuildConfig }}
     - name: llamastack-build-config
