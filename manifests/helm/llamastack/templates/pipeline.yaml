@@ -71,8 +71,6 @@ spec:
           value: ${{values.source_repository}}
         - name: REVISION
           value: main
-        - name: SUBDIRECTORY
-          value: template
       taskRef:
         resolver: cluster
         params:
@@ -84,13 +82,13 @@ spec:
           value: openshift-pipelines
       workspaces:
         - name: output
-          workspace: shared-folder
+          workspace: chroma-folder
     - name: buildah-chroma
       params:
         - name: IMAGE
           value: $(params.chromadb-image)
         - name: DOCKERFILE
-          value: template/skeleton/chromaDockerfile
+          value: ./chromaDockerfile
       runAfter:
         - git-clone-chroma
       taskRef:
@@ -104,7 +102,7 @@ spec:
           value: openshift-pipelines
       workspaces:
         - name: source
-          workspace: shared-folder
+          workspace: chroma-folder
     {{- if $.Values.llamastackBuildConfig }}
     - name: llamastack-build-config
       taskRef:
@@ -140,3 +138,4 @@ spec:
           workspace: shared-folder
   workspaces:
     - name: shared-folder
+    - name: chroma-folder

@@ -28,3 +28,11 @@ spec:
         resources:
           requests:
             storage: 5Gi
+  - name: chroma-folder
+    volumeClaimTemplate:
+      spec:
+        accessModes:
+        - ReadWriteOnce
+        resources:
+          requests:
+            storage: 1Gi
