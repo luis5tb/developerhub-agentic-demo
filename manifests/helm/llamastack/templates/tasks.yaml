@@ -47,7 +47,7 @@ spec:
         cp -r ~/.llama/distributions/$(params.image-name) /workspace/output/
 
         podman tag localhost/$(params.image-name):dev $(params.image-url)
-        podman push --tls-verify=false $(params.image-url)
+        podman push $(params.image-url)
       volumeMounts:
         - name: build-config
           mountPath: "/config"
@@ -108,7 +108,7 @@ spec:
         cp -r ~/.llama/distributions/$(params.image-name) /workspace/output/
 
         podman tag localhost/$(params.image-name):dev $(params.image-url)
-        podman push --tls-verify=false $(params.image-url)
+        podman push $(params.image-url)
   workspaces:
     - name: output
       description: Workspace to place the build/run config files
