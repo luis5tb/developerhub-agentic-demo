@@ -60,6 +60,16 @@ spec:
                   name: llm-sa-secret
                   key: model_name
               #value: {{ $.Values.modelName }}
+            - name: LLAMASTACK_ENDPOINT
+              valueFrom:
+                configMapKeyRef:
+                  name: {{ $.Value.llamastackCM }}
+                  key: llamastack_endpoint
+            - name: LLAMASTACK_MODEL
+              valueFrom:
+                configMapKeyRef:
+                  name: {{ $.Value.llamastackCM }}
+                  key: model_name
       {{- with $.Values.nodeSelector }}
       nodeSelector:
         {{- toYaml . | nindent 8 }}

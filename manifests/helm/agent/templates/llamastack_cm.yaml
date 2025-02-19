@@ -1,0 +1,10 @@
+{{ $endpoint := printf "http://%s.%s.svc.cluster.local:%s" $.Values.llamastackServer  $.Values.llamastackNamespace $.Values.llamastackPort }}
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ $.Value.llamastackCM }}
+  namespace: {{ $.Values.namespace }}
+data:
+  llamastack_endpoint: {{ $endpoint }}
+  model_name: {{ $.Values.modelName}}

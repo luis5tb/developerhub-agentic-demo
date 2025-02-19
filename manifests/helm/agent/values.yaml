@@ -4,9 +4,15 @@ name: agent
 modelName: ${{values.model_name}}
 saName: model-default
 
+
 namespace: ${{values.namespace}}
 vllmNamespace: vllm-${{values.namespace}}
 cluster_app: ${{values.cluster}}
+llamastackCM: llamastack-cm
+llamastackNamespace: llamastack-${{values.namespace}}
+llamastackServer: llamastack-server
+llamastackPort: 5001
+
 
 labels:
   app: agent-app
