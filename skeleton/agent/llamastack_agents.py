@@ -6,7 +6,8 @@ import prompts
 
 from llama_stack_client import LlamaStackClient
 from llama_stack_client.lib.agents.agent import Agent
-from llama_stack_client.types import AgentConfig, UserMessage
+from llama_stack_client.types import UserMessage
+from llama_stack_client.types.agent_create_params import AgentConfig
 # from llama_stack_client.types.agents import Session, SessionCreateResponse
 
 
@@ -143,7 +144,7 @@ class RecommendationAgent:
         response = self.agent.create_turn(
             session_id=self.session_id,
             messages=[
-                UserMessage(content=message, role="user"),
+                UserMessage(content=str(message), role="user"),
             ],
             stream=False)
 
