@@ -3,7 +3,7 @@
 apiVersion: v1
 kind: ConfigMap
 metadata:
-  name: {{ $.Value.llamastackCM }}
+  name: {{ $.Values.llamastackCM }}
   namespace: {{ $.Values.namespace }}
 data:
   llamastack_endpoint: {{ $endpoint }}
