@@ -63,12 +63,12 @@ spec:
             - name: LLAMASTACK_ENDPOINT
               valueFrom:
                 configMapKeyRef:
-                  name: {{ $.Value.llamastackCM }}
+                  name: {{ $.Values.llamastackCM }}
                   key: llamastack_endpoint
             - name: LLAMASTACK_MODEL
               valueFrom:
                 configMapKeyRef:
-                  name: {{ $.Value.llamastackCM }}
+                  name: {{ $.Values.llamastackCM }}
                   key: model_name
       {{- with $.Values.nodeSelector }}
       nodeSelector:
