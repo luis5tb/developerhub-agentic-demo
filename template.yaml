@@ -16,6 +16,7 @@ metadata:
     - ResponsibleAI
     - AISafety
     - LlamaStack
+    - HybridCloud
 spec:
   owner: luis5tb
   type: service
