@@ -47,7 +47,7 @@ spec:
     - name: run-lmeval
       image: {{ .Values.evalOptions.baseImage }}
       script: |
-        cat <<EOF > /workspace/evaljob.yaml
+        cat <<EOF > /workspace/shared-data/evaljob.yaml
         apiVersion: trustyai.opendatahub.io/v1alpha1
         kind: LMEvalJob
         metadata:
@@ -59,26 +59,26 @@ spec:
         EOF
 
         if [ ${#params.tasks_name[@]} -gt 0 ]; then
-          echo "    taskNames:" >> /workspace/evaljob.yaml
+          echo "    taskNames:" >> /workspace/shared-data/evaljob.yaml
           for task in $(params.tasks_name[*]); do
-            echo "      - $task" >> /workspace/evaljob.yaml
+            echo "      - $task" >> /workspace/shared-data/evaljob.yaml
           done
         elif [ -n "$(params.task_recipe.template)" ]; then
-          echo "    taskRecipes:" >> /workspace/evaljob.yaml
-          echo "    - template: $(params.taskrecipe.template)" >> /workspace/evaljob.yaml
-          echo "      card:" >> /workspace/evaljob.yaml
+          echo "    taskRecipes:" >> /workspace/shared-data/evaljob.yaml
+          echo "    - template: $(params.taskrecipe.template)" >> /workspace/shared-data/evaljob.yaml
+          echo "      card:" >> /workspace/shared-data/evaljob.yaml
           if [ -n "$(params.task_recipe.card.name)" ]; then           
-            echo "        name: $(params.task_recipe.card.name)" >> /workspace/evaljob.yaml
+            echo "        name: $(params.task_recipe.card.name)" >> /workspace/shared-data/evaljob.yaml
           elif [ -n "$(params.task_recipe.card.custom)" ]; then
-            echo "        custom: |" >> /workspace/evaljob.yaml
-            echo "$(params.task_recipe.card.custom)" | sed 's/^/          /' >> /workspace/evaljob.yaml
+            echo "        custom: |" >> /workspace/shared-data/evaljob.yaml
+            echo "$(params.task_recipe.card.custom)" | sed 's/^/          /' >> /workspace/shared-data/evaljob.yaml
           fi
         else
           echo "Error: Either tasks_names or task_recipe must be provided."
           exit 1
         fi
 
-        cat <<EOF >> /workspace/evaljob.yaml
+        cat <<EOF >> /workspace/shared-data/evaljob.yaml
           logSamples: true
           batchSize: "1"
           allowOnline: true
@@ -120,7 +120,7 @@ spec:
               size: 5Gi 
         EOF
 
-        oc create -f /workspace/evaljob.yaml
+        oc create -f /workspace/shared-data/evaljob.yaml
 
         # Wait for job completion
         oc wait -n {{ .Values.namespace }} --timeout=3600s --for=condition=complete lmevaljob/$(params.job_name)
