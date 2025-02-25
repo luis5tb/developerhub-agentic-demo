@@ -7,6 +7,9 @@ metadata:
     backstage.io/kubernetes-id: ${{values.component_id}}
 spec:
   params:
+    - name: job_name
+      description: name of the lm eval job
+      type: string
     - name: model
       description: name of the model to evaluate
       type: string
@@ -25,28 +28,61 @@ spec:
     - name: tokenizer
       description: Tokenizer
       type: string
-    - name: task_name
-      type: string
-      description: Eval Task to use
+    - name: tasks_name
+      type: array
+      description: Eval Tasks to use (only set task_name or task_recipe)
+      default: []
+    - name: task_recipe
+      description: Eval Recipe to use (only set task_name or task_recipe)
+      type: object
+      properties:
+        card:
+          type: object
+          properties:
+            name: {type: string}
+            custom: {type: string}
+        template: {type: string}
+      default: {}
   steps:
     - name: run-lmeval
       image: {{ .Values.evalOptions.baseImage }}
       script: |
-        oc create -f - <<EOF
+        cat <<EOF > /workspace/evaljob.yaml
         apiVersion: trustyai.opendatahub.io/v1alpha1
         kind: LMEvalJob
         metadata:
-          name: lmeval-job
+          name: $(params.job_name)
           namespace: {{ .Values.namespace}}
         spec:
           model: local-completions
-          taskList:
-            taskNames:
-              - $(params.task_name)
+          taskList:        
+        EOF
+
+        if [ ${#params.tasks_name[@]} -gt 0 ]; then
+          echo "    taskNames:" >> /workspace/evaljob.yaml
+          for task in $(params.tasks_name[*]); do
+            echo "      - $task" >> /workspace/evaljob.yaml
+          done
+        elif [ -n "$(params.task_recipe.template)" ]; then
+          echo "    taskRecipes:" >> /workspace/evaljob.yaml
+          echo "    - template: $(params.taskrecipe.template)" >> /workspace/evaljob.yaml
+          echo "      card:" >> /workspace/evaljob.yaml
+          if [ -n "$(params.task_recipe.card.name)" ]; then           
+            echo "        name: $(params.task_recipe.card.name)" >> /workspace/evaljob.yaml
+          elif [ -n "$(params.task_recipe.card.custom)" ]; then
+            echo "        custom: |" >> /workspace/evaljob.yaml
+            echo "$(params.task_recipe.card.custom)" | sed 's/^/          /' >> /workspace/evaljob.yaml
+          fi
+        else
+          echo "Error: Either tasks_names or task_recipe must be provided."
+          exit 1
+        fi
+
+        cat <<EOF >> /workspace/evaljob.yaml
           logSamples: true
           batchSize: "1"
           allowOnline: true
-          allowCodeExecution: false
+          allowCodeExecution: true
           modelArgs:
             - name: model
               value: $(params.model)
@@ -83,7 +119,10 @@ spec:
             pvcManaged: 
               size: 5Gi 
         EOF
+
+        oc create -f /workspace/evaljob.yaml
+
         # Wait for job completion
-        oc wait -n {{ .Values.namespace }} --timeout=3600s --for=condition=complete lmevaljob/lmeval-job
+        oc wait -n {{ .Values.namespace }} --timeout=3600s --for=condition=complete lmevaljob/$(params.job_name)
   workspaces:
     - name: shared-data

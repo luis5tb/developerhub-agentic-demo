@@ -12,7 +12,7 @@ evalOptions:
   tokenizedRequests: false
   verifyCertificate: false
   tokenizer: ibm-granite/granite-3.1-2b-instruct
-  taskName: mmlu
+  tasksName: mmlu,hellaswag
   baseImage: image-registry.openshift-image-registry.svc:5000/openshift/cli:latest
 
 secretStore:

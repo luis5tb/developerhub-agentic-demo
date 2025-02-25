@@ -10,6 +10,9 @@ metadata:
     backstage.io/kubernetes-id: ${{values.component_id}}
 spec:
   params:
+    - name: lmevaljob_name
+      default: lmeval-job
+      type: string
     - name: model
       default: {{ .Values.modelName }}
       description: name of the model to evaluate
@@ -34,15 +37,24 @@ spec:
       default: {{ .Values.evalOptions.tokenizer }}
       description: Tokenizer
       type: string
-    - name: task_name
-      default: {{ .Values.evalOptions.taskName}}
-      type: string
-      description: Eval Task to use
+    - name: task_names
+      default: {{ .Values.evalOptions.tasksName}}
+      type: array
+      description: Eval Task to use (only set task_name or task_recipe)
+    - name: task_recipe
+      type: object
+      description: Eval Recipe to use (only set task_name or task_recipe)
+      properties:
+        card: {}
+        template: {}
+
   tasks:
     - name: run-lmeval-job
       taskRef:
         name: lmeval-task
       params:
+        - name: job_name
+          value: $(params.lmevaljob_name)
         - name: model
           value: $(params.model)
         - name: url
@@ -55,8 +67,10 @@ spec:
           value: $(params.tokenized_requests)
         - name: tokenizer
           value: $(params.tokenizer)
-        - name: task_name
-          value: $(params.task_name)
+        - name: tasks_name
+          value: ["$(params.tasks_name[*])"]
+        - name: task_recipe
+          value: $(params.task_recipe[*])
       workspaces:
         - name: shared-data
           workspace: shared-data
