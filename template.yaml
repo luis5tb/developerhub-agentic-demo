@@ -11,12 +11,12 @@ metadata:
     #- llamastack
     #- hyperscalers
     #- trustyai
-    - RedHatAI
-    - AgenticAI
-    - ResponsibleAI
-    - AISafety
-    - LlamaStack
-    - HybridCloud
+    - red-hat-ai
+    - agentic-ai
+    - responsible-ai
+    - ai-safety
+    - llamastack
+    - hybrid-cloud
 spec:
   owner: luis5tb
   type: service
