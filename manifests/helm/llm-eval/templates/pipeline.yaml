@@ -45,9 +45,9 @@ spec:
       type: object
       description: Eval Recipe to use (only set task_name or task_recipe)
       properties:
-        card: {}
+        card_name: {}
+        card_custom: {}
         template: {}
-
   tasks:
     - name: run-lmeval-job
       taskRef:
