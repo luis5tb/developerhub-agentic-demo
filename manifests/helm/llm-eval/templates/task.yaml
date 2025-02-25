@@ -36,11 +36,8 @@ spec:
       description: Eval Recipe to use (only set task_name or task_recipe)
       type: object
       properties:
-        card:
-          type: object
-          properties:
-            name: {type: string}
-            custom: {type: string}
+        card_name: {type: string}
+        card_custom: {type: string}
         template: {type: string}
       default: {}
   steps:
@@ -52,26 +49,26 @@ spec:
         kind: LMEvalJob
         metadata:
           name: $(params.job_name)
-          namespace: {{ .Values.namespace}}
+          namespace: {{ .Values.namespace }}
         spec:
           model: local-completions
-          taskList:        
+          taskList:
         EOF
 
-        if [ ${#params.tasks_name[@]} -gt 0 ]; then
+        if [ "$(params.tasks_name)" != "[]" ]; then
           echo "    taskNames:" >> /workspace/shared-data/evaljob.yaml
-          for task in $(params.tasks_name[*]); do
+          for task in ${params.tasks_name[@]}; do
             echo "      - $task" >> /workspace/shared-data/evaljob.yaml
           done
         elif [ -n "$(params.task_recipe.template)" ]; then
           echo "    taskRecipes:" >> /workspace/shared-data/evaljob.yaml
-          echo "    - template: $(params.taskrecipe.template)" >> /workspace/shared-data/evaljob.yaml
+          echo "    - template: $(params.task_recipe.template)" >> /workspace/shared-data/evaljob.yaml
           echo "      card:" >> /workspace/shared-data/evaljob.yaml
-          if [ -n "$(params.task_recipe.card.name)" ]; then           
-            echo "        name: $(params.task_recipe.card.name)" >> /workspace/shared-data/evaljob.yaml
-          elif [ -n "$(params.task_recipe.card.custom)" ]; then
+          if [ -n "$(params.task_recipe.card_name)" ]; then
+            echo "        name: $(params.task_recipe.card_name)" >> /workspace/shared-data/evaljob.yaml
+          elif [ -n "$(params.task_recipe.card_custom)" ]; then 
             echo "        custom: |" >> /workspace/shared-data/evaljob.yaml
-            echo "$(params.task_recipe.card.custom)" | sed 's/^/          /' >> /workspace/shared-data/evaljob.yaml
+            echo "$(params.task_recipe.card_custom)" | sed 's/^/          /' >> /workspace/shared-data/evaljob.yaml
           fi
         else
           echo "Error: Either tasks_names or task_recipe must be provided."
@@ -87,7 +84,7 @@ spec:
             - name: model
               value: $(params.model)
             - name: base_url
-              value: $(params.url)/v1/completions 
+              value: $(params.url)/v1/completions
             - name: num_concurrent
               value: "$(params.num_concurrent)"
             - name: max_retries
@@ -98,16 +95,16 @@ spec:
               value: $(params.tokenizer)
             - name: verify_certificate
               value: "{{ $.Values.evalOptions.verifyCertificate }}"
-          pod: 
+          pod:
             container:
               env:
-              - name: OPENAI_API_KEY 
+              - name: OPENAI_API_KEY
                 valueFrom:
-                      secretKeyRef: 
+                      secretKeyRef:
                         name: {{ $.Values.saName }}-{{ $.Values.modelName }}-sa
-                        key: token 
+                        key: token
               resources:
-                  limits: 
+                  limits:
                     cpu: '1'
                     memory: 8Gi
                     nvidia.com/gpu: '1'
@@ -115,9 +112,9 @@ spec:
                     cpu: '1'
                     memory: 8Gi
                     nvidia.com/gpu: '1'
-          outputs: 
-            pvcManaged: 
-              size: 5Gi 
+          outputs:
+            pvcManaged:
+              size: 5Gi
         EOF
 
         oc create -f /workspace/shared-data/evaljob.yaml
