@@ -5,16 +5,15 @@ metadata:
   title: Agent to show Gen AI with OpenShift AI with Hyperscalers integration
   description: LangGraph Agent to show Gen AI with OpenShift AI and integration with hyperscalers functionality (VectorDBs, Guardrails, ...)
   tags:
-    - redhatai
-    - agenticai
-    - responsibleai
-    - aisafety
+    - redhati-ai
+    - agentic-ai
+    - responsible-ai
+    - ai-safety
     - llamastack
-    - hybridcloud
+    - hybrid-cloud
 spec:
   owner: luis5tb
   type: service
-
   parameters:
     - title: Provide information about the GitHub location
       required:
