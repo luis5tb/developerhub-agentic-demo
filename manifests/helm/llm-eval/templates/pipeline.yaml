@@ -37,7 +37,7 @@ spec:
       default: {{ .Values.evalOptions.tokenizer }}
       description: Tokenizer
       type: string
-    - name: task_names
+    - name: tasks_name
       default: {{ .Values.evalOptions.tasksName}}
       type: array
       description: Eval Task to use (only set task_name or task_recipe)
