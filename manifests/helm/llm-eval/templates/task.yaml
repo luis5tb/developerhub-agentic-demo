@@ -33,7 +33,7 @@ spec:
       description: Eval Tasks to use (only set task_name or task_recipe)
       default: []
     - name: task_recipe
-      description: Eval Recipe to use (only set task_name or task_recipe)
+      description: Eval Recipe to use (object with the template and then either the card_name or card_custom)
       type: object
       properties:
         card_name: {type: string}
@@ -55,7 +55,7 @@ spec:
           taskList:
         EOF
 
-        if [ "$(params.tasks_name)" != "[]" ]; then
+        if [ ${params.tasks_name[*]} != "[]" ]; then
           echo "    taskNames:" >> /workspace/shared-data/evaljob.yaml
           for task in ${params.tasks_name[@]}; do
             echo "      - $task" >> /workspace/shared-data/evaljob.yaml
