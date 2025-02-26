@@ -64,7 +64,8 @@ spec:
             done
         elif [ -n "$(params.task_recipe.template)" ]; then
           echo "    taskRecipes:" >> /workspace/shared-data/evaljob.yaml
-          echo "    - template: \"$(params.task_recipe.template)\"" >> /workspace/shared-data/evaljob.yaml
+          echo "    - template:" >> /workspace/shared-data/evaljob.yaml
+          echo "        name: \"$(params.task_recipe.template)\"" >> /workspace/shared-data/evaljob.yaml
           echo "      card:" >> /workspace/shared-data/evaljob.yaml
           if [ -n "$(params.task_recipe.card_name)" ]; then
             echo "        name: \"$(params.task_recipe.card_name)\"" >> /workspace/shared-data/evaljob.yaml
