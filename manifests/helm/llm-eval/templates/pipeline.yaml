@@ -48,6 +48,7 @@ spec:
         card_name: {}
         card_custom: {}
         template: {}
+      default: {"card_name": "", "card_custom": "", "template": ""}
   tasks:
     - name: run-lmeval-job
       taskRef:
