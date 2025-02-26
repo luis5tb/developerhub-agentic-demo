@@ -43,6 +43,8 @@ spec:
   steps:
     - name: run-lmeval
       image: {{ .Values.evalOptions.baseImage }}
+      args:
+        - "$(params.tasks_name[*])"
       script: |
         cat <<EOF > /workspace/shared-data/evaljob.yaml
         apiVersion: trustyai.opendatahub.io/v1alpha1
@@ -55,20 +57,20 @@ spec:
           taskList:
         EOF
 
-        if [ ${params.tasks_name[*]} != "[]" ]; then
-          echo "    taskNames:" >> /workspace/shared-data/evaljob.yaml
-          for task in ${params.tasks_name[@]}; do
-            echo "      - $task" >> /workspace/shared-data/evaljob.yaml
-          done
+        if [ "$#" -gt 0 ] && [ -n "$1" ]; then
+            echo "    taskNames:" >> /workspace/shared-data/evaljob.yaml
+            for task in "$@"; do
+              echo "      - $task" >> /workspace/shared-data/evaljob.yaml
+            done
         elif [ -n "$(params.task_recipe.template)" ]; then
           echo "    taskRecipes:" >> /workspace/shared-data/evaljob.yaml
           echo "    - template: $(params.task_recipe.template)" >> /workspace/shared-data/evaljob.yaml
           echo "      card:" >> /workspace/shared-data/evaljob.yaml
           if [ -n "$(params.task_recipe.card_name)" ]; then
-            echo "        name: $(params.task_recipe.card_name)" >> /workspace/shared-data/evaljob.yaml
+            echo "        name: \'$(params.task_recipe.card_name)\'" >> /workspace/shared-data/evaljob.yaml
           elif [ -n "$(params.task_recipe.card_custom)" ]; then 
             echo "        custom: |" >> /workspace/shared-data/evaljob.yaml
-            echo "$(params.task_recipe.card_custom)" | sed 's/^/          /' >> /workspace/shared-data/evaljob.yaml
+            echo "\'$(params.task_recipe.card_custom)\'" | sed 's/^/          /' >> /workspace/shared-data/evaljob.yaml
           fi
         else
           echo "Error: Either tasks_names or task_recipe must be provided."
@@ -117,6 +119,7 @@ spec:
               size: 5Gi
         EOF
 
+        cat /workspace/shared-data/evaljob.yaml
         oc create -f /workspace/shared-data/evaljob.yaml
 
         # Wait for job completion
