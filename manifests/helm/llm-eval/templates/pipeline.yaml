@@ -41,14 +41,18 @@ spec:
       default: {{ .Values.evalOptions.tasksName}}
       type: array
       description: Eval Task to use (only set task_name or task_recipe)
-    - name: task_recipe
-      type: object
-      description: Eval Recipe to use (only set task_name or task_recipe)
-      properties:
-        card_name: {}
-        card_custom: {}
-        template: {}
-      default: {"card_name": "", "card_custom": "", "template": ""}
+    - name: task_recipe_card_name
+      type: string
+      default: ""
+      description: Eval Recipe Card Name to use (only if task_name not set. Also, either set card_name or card_custom but not both)
+    - name: task_recipe_card_custom
+      type: string
+      default: ""
+      description: Eval Recipe Card Custom to use (only if task_name not set. Also, either set card_name or card_custom but not both)
+    - name: task_recipe_template
+      type: string
+      default: ""
+      description: Eval Recipe Template to use (only if task_name not set)
   tasks:
     - name: run-lmeval-job
       taskRef:
@@ -70,8 +74,12 @@ spec:
           value: $(params.tokenizer)
         - name: tasks_name
           value: ["$(params.tasks_name[*])"]
-        - name: task_recipe
-          value: $(params.task_recipe[*])
+        - name: task_recipe_card_name
+          value: $(params.task_recipe_card_name)
+        - name: task_recipe_card_custom
+          value: $(params.task_recipe_card_custom)
+        - name: task_recipe_template
+          value: $(params.task_recipe_template)
       workspaces:
         - name: shared-data
           workspace: shared-data

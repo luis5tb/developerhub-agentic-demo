@@ -30,16 +30,20 @@ spec:
       type: string
     - name: tasks_name
       type: array
-      description: Eval Tasks to use (only set task_name or task_recipe)
+      description: Eval Tasks to use (only set task_name or task_recipe_X)
       default: []
-    - name: task_recipe
-      description: Eval Recipe to use (object with the template and then either the card_name or card_custom)
-      type: object
-      properties:
-        card_name: {type: string}
-        card_custom: {type: string}
-        template: {type: string}
-      default: {}
+    - name: task_recipe_card_name
+      type: string
+      description: Eval Recipe Card Name to use (Either the card_name or card_custom should be filled)
+      default: ""
+    - name: task_recipe_card_custom
+      type: string
+      description: Eval Recipe Card Custom to use (Either the card_name or card_custom should be filled)
+      default: ""
+    - name: task_recipe_template
+      type: string
+      description: Eval Recipe Template
+      default: ""
   steps:
     - name: run-lmeval
       image: {{ .Values.evalOptions.baseImage }}
@@ -62,19 +66,19 @@ spec:
             for task in "$@"; do
               echo "      - $task" >> /workspace/shared-data/evaljob.yaml
             done
-        elif [ -n "$(params.task_recipe.template)" ]; then
+        elif [ -n "$(params.task_recipe_template)" ]; then
           echo "    taskRecipes:" >> /workspace/shared-data/evaljob.yaml
           echo "    - template:" >> /workspace/shared-data/evaljob.yaml
-          echo "        name: \"$(params.task_recipe.template)\"" >> /workspace/shared-data/evaljob.yaml
+          echo "        name: \"$(params.task_recipe_template)\"" >> /workspace/shared-data/evaljob.yaml
           echo "      card:" >> /workspace/shared-data/evaljob.yaml
-          if [ -n "$(params.task_recipe.card_name)" ]; then
-            echo "        name: \"$(params.task_recipe.card_name)\"" >> /workspace/shared-data/evaljob.yaml
-          elif [ -n "$(params.task_recipe.card_custom)" ]; then 
+          if [ -n "$(params.task_recipe_card_name)" ]; then
+            echo "        name: \"$(params.task_recipe_card_name)\"" >> /workspace/shared-data/evaljob.yaml
+          elif [ -n "$(params.task_recipe_card_custom)" ]; then
             echo "        custom: |" >> /workspace/shared-data/evaljob.yaml
-            echo "\"$(params.task_recipe.card_custom)\"" | sed 's/^/          /' >> /workspace/shared-data/evaljob.yaml
+            echo "\"$(params.task_recipe_card_custom)\"" | sed 's/^/          /' >> /workspace/shared-data/evaljob.yaml
           fi
         else
-          echo "Error: Either tasks_names or task_recipe must be provided."
+          echo "Error: Either tasks_names or task_recipe_* must be provided."
           exit 1
         fi
 
