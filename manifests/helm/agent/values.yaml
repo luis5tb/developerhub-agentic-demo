@@ -10,7 +10,7 @@ vllmNamespace: vllm-${{values.namespace}}
 cluster_app: ${{values.cluster}}
 llamastackCM: llamastack-cm
 llamastackNamespace: llamastack-${{values.namespace}}
-llamastackServer: llamastack-server
+llamastackServerSvc: llamastack-server-svc
 llamastackPort: 5001
 
 

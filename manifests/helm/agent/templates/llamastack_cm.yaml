@@ -1,4 +1,4 @@
-{{ $endpoint := printf "http://%s.%s.svc.cluster.local:%d" $.Values.llamastackServer  $.Values.llamastackNamespace (int $.Values.llamastackPort) }}
+{{ $endpoint := printf "http://%s.%s.svc.cluster.local:%d" $.Values.llamastackServerSvc  $.Values.llamastackNamespace (int $.Values.llamastackPort) }}
 ---
 apiVersion: v1
 kind: ConfigMap
