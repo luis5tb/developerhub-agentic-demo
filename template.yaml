@@ -2,7 +2,7 @@ apiVersion: scaffolder.backstage.io/v1beta3
 kind: Template
 metadata:
   name: agent-template
-  title: Agent to show Gen AI with OpenShift AI with Hyperscalers integration
+  title: Stock recommendation AI Agents with OpenShift, OpenShift AI and Bedrock
   description: LangGraph Agent to show Gen AI with OpenShift AI and integration with hyperscalers functionality (VectorDBs, Guardrails, ...)
   tags:
     - redhat-ai
