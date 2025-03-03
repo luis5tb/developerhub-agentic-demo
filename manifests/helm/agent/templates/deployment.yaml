@@ -60,6 +60,9 @@ spec:
                   name: llm-sa-secret
                   key: model_name
               #value: {{ $.Values.modelName }}
+          envFrom:
+            - secretRef:
+                name: azure-vectordb
       {{- with $.Values.nodeSelector }}
       nodeSelector:
         {{- toYaml . | nindent 8 }}

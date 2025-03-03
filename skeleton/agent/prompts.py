@@ -20,11 +20,10 @@ When external data is needed, output a **structured tool call** instead of a nat
 Strictly follow these guidelines before responding.
 
 ### **Task Information:**
-{stock}
-"""
+- **Stock:** {stock}
+- **Messages:** {messages}
 
-# - **Stock:** {stock}
-# - **Feedback (if any):** {feedback}
+"""
 
 summary_prompt = """You are a financial analyst tasked with summarizing key financial insights for {stock}.
 
@@ -41,11 +40,11 @@ Provide a **concise and structured summary** (max 400 words) covering:
 - **Avoid generic statements**; focus on specifics relevant to {messages}.
 
 ### **Available Data:**
-- **Query:** {messages}
+- **Context Data:** {context}
+- **Previos messages:** {messages}
+- **Query:** {stock}
 
 Provide the summary in a **structured format** for readability."""
-
-# - **Context Data:** {context}
 
 recommender_prompt = """You are a financial advisor providing a recommendation for a given stock based on the given summary and the context.
 

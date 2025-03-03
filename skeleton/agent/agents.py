@@ -1,31 +1,36 @@
 from langgraph.graph.message import add_messages
 
-# from langchain_core.output_parsers import StrOutputParser
-#from langchain_core.messages import HumanMessage, AIMessage, ToolMessage
 from langchain_core.messages import AIMessage, ToolMessage
-from langchain_core.prompts import ChatPromptTemplate, MessagesPlaceholder
-# from langchain_community.llms import VLLMOpenAI
+from langchain_core.prompts import ChatPromptTemplate
+from langchain_core.runnables import RunnablePassthrough
 from langchain_openai import ChatOpenAI
 from langchain.callbacks.streaming_stdout import StreamingStdOutCallbackHandler
 
-# from langchain.chains import ConversationChain
-# from langchain.memory import ConversationBufferMemory
-# from langchain.chains import LLMChain
-# from langchain.prompts import PromptTemplate
-# from langchain_core.messages import BaseMessage
+# Hyperscalers Retrievers
+from langchain_community.retrievers import AzureAISearchRetriever
 
 import agent_states
 import httpx
+import os
 import prompts
+
+LLM_ENDPOINT = os.getenv("LLM_ENDPOINT")
+TOKEN = os.getenv("API_KEY")
+MODEL_NAME = os.getenv("MODEL_NAME")
+
+# Hyperscaler VectorDBs
+AZURE_AI_SEARCH_SERVICE_NAME = os.getenv("AZURE_AI_SEARCH_SERVICE_NAME")
+AZURE_AI_SEARCH_API_KEY = os.getenv("AZURE_AI_SEARCH_API_KEY")
+AZURE_AI_INDEX_NAME = os.getenv("AZURE_AI_INDEX_NAME")
 
 
 class ResearchAgent:
-    def __init__(self, llm_endpoint, llm_token, model_name, tools=None):
+    def __init__(self, tools=None):
 
         self.llm = ChatOpenAI(
-            openai_api_key=llm_token,
-            openai_api_base=llm_endpoint,
-            model_name=model_name,
+            openai_api_key=TOKEN,
+            openai_api_base=LLM_ENDPOINT,
+            model_name=MODEL_NAME,
             top_p=0.92,
             temperature=0.01,
             max_tokens=2048,
@@ -36,17 +41,28 @@ class ResearchAgent:
             http_client=httpx.Client(verify=False))
 
         research_prompt = ChatPromptTemplate.from_messages([
-            #("system", prompts.system_prompt),
+            ("system", prompts.system_prompt),
             ("system", prompts.researcher_prompt),
-            MessagesPlaceholder(variable_name="stock"),
             ])
         research_prompt = research_prompt.partial(
             tool_names=", ".join([tool.name for tool in tools]))
 
         if tools:
-            self.agent = research_prompt | self.llm.bind_tools(tools)  #, strict=True, tool_choice="auto")
+            self.agent = (
+                {"stock": RunnablePassthrough(),
+                 "messages": RunnablePassthrough(),
+                }
+                | research_prompt
+                | self.llm.bind_tools(tools)
+            )
         else:
-            self.agent = research_prompt | self.llm
+            self.agent = (
+                {"stock": RunnablePassthrough(),
+                 "messages": RunnablePassthrough(),
+                }
+                | research_prompt
+                | self.llm
+            )
 
     def __call__(self, state: agent_states.State) -> agent_states.State:
         # Implement your custom logic here
@@ -56,7 +72,7 @@ class ResearchAgent:
             "stock": state["stock"],
             "messages": state.get("messages", "")
         }
-        response = self.agent.invoke([str(stock)])
+        response = self.agent.invoke([stock])
 
         if isinstance(response, ToolMessage):
             result = response
@@ -70,12 +86,12 @@ class ResearchAgent:
 
 
 class SummarizationAgent:
-    def __init__(self, llm_endpoint, llm_token, model_name):
+    def __init__(self, tools=None):
 
         self.llm = ChatOpenAI(
-            openai_api_key=llm_token,
-            openai_api_base=llm_endpoint,
-            model_name=model_name,
+            openai_api_key=TOKEN,
+            openai_api_base=LLM_ENDPOINT,
+            model_name=MODEL_NAME,
             top_p=0.92,
             temperature=0.01,
             max_tokens=2048,
@@ -85,23 +101,34 @@ class SummarizationAgent:
             async_client=httpx.AsyncClient(verify=False),
             http_client=httpx.Client(verify=False))
 
+        # Azure VectorDB Index
+        def format_docs(docs):
+            return "\n\n".join(doc.page_content for doc in docs)
+
+        self.retriever = AzureAISearchRetriever(
+            content_key="content", top_k=1, index_name=AZURE_AI_INDEX_NAME)
+
         summary_prompt = ChatPromptTemplate.from_messages([
             ("system", prompts.system_prompt),
             ("user", prompts.summary_prompt),
-            MessagesPlaceholder(variable_name="messages"),
             ])
 
-        self.agent = summary_prompt | self.llm
+        self.agent = (
+            {"context": self.retriever | format_docs,
+             "messages": RunnablePassthrough(),
+             "stock": RunnablePassthrough(),
+            }
+            | summary_prompt
+            | self.llm
+        )
 
     def __call__(self, state: agent_states.State) -> agent_states.State:
         print("Running Summarizer:")
-        context = ""  # TO DO: to be obtained from vectordb
         message = {
             "stock": state["stock"],
-            "context": context,
             "messages": state.get("messages", []),
         }
-        response = self.agent.invoke(message)
+        response = self.agent.invoke([message])
         summaries = state.get("summary", [])
         return {
                 "summary": add_messages(summaries, [response]),
@@ -109,12 +136,12 @@ class SummarizationAgent:
 
 
 class RecommendationAgent:
-    def __init__(self, llm_endpoint, llm_token, model_name):
+    def __init__(self, tools=None):
 
         self.llm = ChatOpenAI(
-            openai_api_key=llm_token,
-            openai_api_base=llm_endpoint,
-            model_name=model_name,
+            openai_api_key=TOKEN,
+            openai_api_base=LLM_ENDPOINT,
+            model_name=MODEL_NAME,
             top_p=0.92,
             temperature=0.01,
             max_tokens=2048,
@@ -128,7 +155,14 @@ class RecommendationAgent:
             ("system", prompts.system_prompt),
             ("user", prompts.recommender_prompt)])
 
-        self.agent = recommendation_prompt | self.llm
+        self.agent = (
+            {"summary": RunnablePassthrough(),
+             "messages": RunnablePassthrough(),
+             "stock": RunnablePassthrough(),
+            }
+            | recommendation_prompt
+            | self.llm
+        )
 
     def __call__(self, state: agent_states.State) -> agent_states.State:
         print("Running Recommender:")
@@ -137,7 +171,7 @@ class RecommendationAgent:
             "summary": state.get("summary", []),
             "messages": state.get("messages", []),
         }
-        response = self.agent.invoke(message)
+        response = self.agent.invoke([message])
         recommendations = state.get("recommendation", [])
         return {
                 "recommendation": add_messages(recommendations, [response]),
