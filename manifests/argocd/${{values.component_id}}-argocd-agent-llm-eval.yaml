@@ -32,5 +32,5 @@ spec:
     #    factor: 2 # a factor to multiply the base duration after each failed retry
     #    maxDuration: 10m # the maximum amount of time allowed for the backoff strategy
     retry:
-      automated: {}
+      #automated: {}
       limit: 100
