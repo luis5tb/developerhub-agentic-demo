@@ -1,14 +1,7 @@
+import os
 import uuid
 
 from langgraph.graph import StateGraph
-# from langgraph.graph import StateGraph, END
-# from langgraph.graph.message import add_messages
-# from langgraph.checkpoint.memory import MemorySaver
-# from langgraph.prebuilt import ToolNode, tools_condition
-# from langgraph.prebuilt import ToolNode
-
-# from vector_db import VectorDB
-# from guardrails import apply_guardrails
 
 from llama_stack_client import LlamaStackClient
 
@@ -16,6 +9,8 @@ from llama_stack_client import LlamaStackClient
 import llamastack_agents
 import agent_states
 
+LLAMASTACK_ENDPOINT = os.getenv("LLAMASTACK_ENDPOINT")
+LLAMASTACK_MODEL = os.getenv("LLAMASTACK_MODEL")
 
 VECTOR_DB_ID = f"vector-db-{uuid.uuid4().hex}"
 
@@ -35,7 +30,7 @@ VECTORDB = {"provider_id": "chromadb-1"}
 
 
 class LLamaStackAgentGraph:
-    def __init__(self, llamastack_endpoint, model):
+    def __init__(self):
         """
         Initialize the agent graph with vLLM and other components.
 
@@ -43,14 +38,12 @@ class LLamaStackAgentGraph:
             llm_endpoint (str): URL of the deployed vLLM endpoint.
             llm_token (str): Authorization token for the vLLM endpoint.
         """
-        # self.vector_db = VectorDB()
-
-        self.initialize_components(llamastack_endpoint, model)
+        self.initialize_components(LLAMASTACK_ENDPOINT, LLAMASTACK_MODEL)
 
         research_tools = ["builtin::websearch", "buildin::code_interpreter"]
         self.researcher_node = llamastack_agents.ResearchAgent(
-            llamastack_server_endpoint=llamastack_endpoint,
-            model_name=model,
+            llamastack_server_endpoint=LLAMASTACK_ENDPOINT,
+            model_name=LLAMASTACK_MODEL,
             tools=research_tools)
 
         summarization_tools = [{
@@ -58,14 +51,14 @@ class LLamaStackAgentGraph:
             "args": TOOLS["builtin::rag"]["args"],
         }]
         self.summarization_node = llamastack_agents.SummarizationAgent(
-            llamastack_server_endpoint=llamastack_endpoint,
-            model_name=model,
+            llamastack_server_endpoint=LLAMASTACK_ENDPOINT,
+            model_name=LLAMASTACK_MODEL,
             tools=summarization_tools)
 
         recommender_tools = []
         self.recommender_node = llamastack_agents.RecommendationAgent(
-            llamastack_server_endpoint=llamastack_endpoint,
-            model_name=model,
+            llamastack_server_endpoint=LLAMASTACK_ENDPOINT,
+            model_name=LLAMASTACK_MODEL,
             tools=recommender_tools)
 
         # Build the graph

@@ -70,6 +70,9 @@ spec:
                 configMapKeyRef:
                   name: {{ $.Values.llamastackCM }}
                   key: model_name
+          envFrom:
+            - secretRef:
+                name: vectordb-secret
       {{- with $.Values.nodeSelector }}
       nodeSelector:
         {{- toYaml . | nindent 8 }}

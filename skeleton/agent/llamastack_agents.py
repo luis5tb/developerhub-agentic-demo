@@ -2,6 +2,7 @@ from langgraph.graph.message import add_messages
 from langchain_core.messages import AIMessage, ToolMessage
 
 import agent_states
+import os
 import prompts
 
 from llama_stack_client import LlamaStackClient
@@ -9,6 +10,11 @@ from llama_stack_client.lib.agents.agent import Agent
 from llama_stack_client.types import UserMessage
 from llama_stack_client.types.agent_create_params import AgentConfig
 # from llama_stack_client.types.agents import Session, SessionCreateResponse
+
+# Hyperscaler VectorDBs
+AZURE_AI_SEARCH_SERVICE_NAME = os.getenv("AZURE_AI_SEARCH_SERVICE_NAME")
+AZURE_AI_SEARCH_API_KEY = os.getenv("AZURE_AI_SEARCH_API_KEY")
+AZURE_AI_INDEX_NAME = os.getenv("AZURE_AI_INDEX_NAME")
 
 
 class ResearchAgent:

@@ -55,6 +55,21 @@ $ ./pattern.sh make install
 # If you need to regenerate/update the secrets, just update values-secret.yaml.template and load them
 $  cp values-secret.yaml.template ~/.config/hybrid-cloud-patterns/values-secret-multicloud-gitops.yaml
 $  ./pattern.sh make load-secrets
+
+# To use VectorDB from Azure, add the next keys and re-load the secrets
+# (or have them before triggering the make install)
+# If a different VectorDB provider is to be use, use the same name but with the right name/value pairs
+$ cat values-secret.yaml.template
+  - name: vectordb-keys
+    fields:
+    - name: AZURE_AI_SEARCH_SERVICE_NAME
+      value: XXXX
+    - name: AZURE_AI_SEARCH_API_KEY
+      value: XXXX
+    - name: AZURE_AI_INDEX_NAME
+      value: XXXX
+$  cp values-secret.yaml.template ~/.config/hybrid-cloud-patterns/values-secret-multicloud-gitops.yaml
+$  ./pattern.sh make load-secrets
 ```
 
 The template will be automatically imported, but you can clone it, modify it and then import the template into your deployed Red Hat Developer Hub and instantiate it. It will create two repositories in your Git account:
