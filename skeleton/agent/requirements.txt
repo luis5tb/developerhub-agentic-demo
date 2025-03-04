@@ -8,6 +8,7 @@ langchain_experimental
 langgraph
 openai
 requests
+tavily-python
 
 ## llamastack related dependencies
 llama-stack-client
