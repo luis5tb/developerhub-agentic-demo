@@ -13,6 +13,7 @@ class State(TypedDict):
     summary: Annotated[list, add_messages]
     # feedback: Annotated[list, add_messages]
     recommendation: Annotated[list, add_messages]
+    tool_calls_count: int  # Add counter for tool calls
 
 # class InputState(TypedDict):
 #     stock: str

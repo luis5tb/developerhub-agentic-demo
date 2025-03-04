@@ -13,7 +13,6 @@ from langchain.callbacks.streaming_stdout import StreamingStdOutCallbackHandler
 # Hyperscalers Retrievers
 from langchain_aws.retrievers import AmazonKnowledgeBasesRetriever
 from langchain_community.retrievers import AzureAISearchRetriever
-from langchain.chains import RetrievalQA
 
 import agent_states
 import prompts
@@ -22,10 +21,12 @@ LLM_ENDPOINT = os.getenv("LLM_ENDPOINT")
 TOKEN = os.getenv("API_KEY")
 MODEL_NAME = os.getenv("MODEL_NAME")
 
+
 # Hyperscaler VectorDBs
 class SupportedVectorDBProviders(Enum):
     AMAZON_KNOWLEDGE_BASE = "AmazonKnowledgeBase"
     AZURE_AI_SEARCH = "AzureAISearch"
+
 
 # Mapping environment variable values to enum members
 VECTORDB_PROVIDER_MAPPING = {
@@ -33,7 +34,8 @@ VECTORDB_PROVIDER_MAPPING = {
     "AZURE": SupportedVectorDBProviders.AZURE_AI_SEARCH
 }
 
-VECTORDB_PROVIDER = VECTORDB_PROVIDER_MAPPING.get(os.getenv("VECTORDB_PROVIDER", "AWS"))
+VECTORDB_PROVIDER = VECTORDB_PROVIDER_MAPPING.get(
+    os.getenv("VECTORDB_PROVIDER", "AWS"))
 
 # Azure
 AZURE_AI_SEARCH_SERVICE_NAME = os.getenv("AZURE_AI_SEARCH_SERVICE_NAME")
@@ -66,7 +68,7 @@ class ResearchAgent:
             model_name=MODEL_NAME,
             top_p=0.92,
             temperature=0.01,
-            max_tokens=2048,
+            max_tokens=1024,
             presence_penalty=1.03,
             streaming=True,
             callbacks=[StreamingStdOutCallbackHandler()],
@@ -97,29 +99,60 @@ class ResearchAgent:
                 | self.llm
             )
 
+        self.previous_queries = set()  # Track unique tool queries
+
     def __call__(self, state: agent_states.State) -> agent_states.State:
-        # Implement your custom logic here
-        # Access the state and perform actions
         print("Running Researcher:")
-        stock = {
-            "stock": state["stock"],
-            "messages": state.get("messages", "")
-        }
-        response = self.agent.invoke([stock])
-
-        if isinstance(response, ToolMessage):
-            result = response
-        else:
-            if isinstance(response, AIMessage):
-                result = response
-            else:
-                # If response is a dict or has dict-like structure
-                result = AIMessage(content=response.content if hasattr(response, 'content') else response)
-
         messages = state.get("messages", [])
-        return {
-                "messages": add_messages(messages, [result]),
-                }
+
+        # If the last message was a tool response or it's the first call
+        if not messages or (isinstance(messages[-1], ToolMessage)):
+            stock = {
+                "stock": state["stock"],
+                "messages": messages  # messages[-1] if messages else []
+            }
+            response = self.agent.invoke([stock])
+
+            if isinstance(response, AIMessage):
+                # Check for duplicate queries in tool calls
+                if getattr(response, 'tool_calls', None):
+                    unique_tool_calls = []
+                    for tool_call in response.tool_calls:
+                        query = f"{tool_call.get('name')}:{tool_call.get('args', {}).get('query', '')}"
+                        if query not in self.previous_queries:
+                            self.previous_queries.add(query)
+                            unique_tool_calls.append(tool_call)
+
+                    result = AIMessage(
+                        content=response.content,
+                        tool_calls=unique_tool_calls if unique_tool_calls else []
+                    )
+                else:
+                    result = response
+            else:
+                if hasattr(response, 'tool_calls') and response.tool_calls:
+                    # Filter out duplicate queries
+                    unique_tool_calls = []
+                    for tool_call in response.tool_calls:
+                        query = f"{tool_call.get('name')}:{tool_call.get('args', {}).get('query', '')}"
+                        if query not in self.previous_queries:
+                            self.previous_queries.add(query)
+                            unique_tool_calls.append(tool_call)
+
+                    result = AIMessage(
+                        content=response.content if hasattr(response, 'content') else "",
+                        tool_calls=unique_tool_calls if unique_tool_calls else []
+                    )
+                else:
+                    result = AIMessage(
+                        content=response.content if hasattr(response, 'content') else ""
+                    )
+
+            return {
+                    "messages": add_messages(messages, [result]),
+                    }
+        else:
+            return state
 
 
 class SummarizationAgent:
@@ -153,11 +186,10 @@ class SummarizationAgent:
             {"context": self.retriever | format_docs,
              "messages": RunnablePassthrough(),
              "stock": RunnablePassthrough(),
-             }
-             | self.summary_prompt
-             | self.llm
+            }
+            | self.summary_prompt
+            | self.llm
             )
-
 
     def __call__(self, state: agent_states.State) -> agent_states.State:
         print("Running Summarizer:")
@@ -184,7 +216,7 @@ class RecommendationAgent:
             model_name=MODEL_NAME,
             top_p=0.92,
             temperature=0.01,
-            max_tokens=2048,
+            max_tokens=1024,
             presence_penalty=1.03,
             streaming=True,
             callbacks=[StreamingStdOutCallbackHandler()],
