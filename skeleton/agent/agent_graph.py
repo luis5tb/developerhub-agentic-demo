@@ -1,11 +1,8 @@
 from langgraph.graph import StateGraph
-# from langgraph.graph import StateGraph, END
-from langgraph.graph.message import add_messages
-from langgraph.checkpoint.memory import MemorySaver
-# from langgraph.prebuilt import ToolNode, tools_condition
+# from langgraph.checkpoint.memory import MemorySaver
 from langgraph.prebuilt import ToolNode
+from langchain_core.messages import AIMessage
 
-# from vector_db import VectorDB
 from guardrails import apply_guardrails
 
 from tools import get_tools
@@ -23,6 +20,21 @@ class AgentGraph:
             llm_token (str): Authorization token for the vLLM endpoint.
         """
         tools = get_tools()
+        self.MAX_TOOL_CALLS = 3  # Set maximum number of allowed tool calls
+
+        # Create ToolNode with proper state handling
+        def tool_node_with_state(state):
+            # Execute tools and update state
+            result = self.tools_node.invoke(state)
+            print("\nTool node result:", result)
+
+            # Update tool calls count in state
+            return {
+                **result,
+                "tool_calls_count": state.get("tool_calls_count", 0) + 1
+            }
+
+        # Simple ToolNode initialization
         self.tools_node = ToolNode(tools)
 
         # Agents
@@ -40,7 +52,8 @@ class AgentGraph:
         # graph_builder.add_node("input_guardrails",
         #                        self.apply_input_guardrails)
         graph_builder.add_node("researcher", self.researcher_node)
-        graph_builder.add_node("tools", self.tools_node)
+        # Use wrapped tool node
+        graph_builder.add_node("tools", tool_node_with_state)
         graph_builder.add_node("summarizer", self.summarization_node)
         graph_builder.add_node("recommender", self.recommender_node)
 
@@ -54,7 +67,11 @@ class AgentGraph:
         # graph_builder.add_conditional_edges("researcher", tools_condition)
         graph_builder.add_conditional_edges(
             "researcher", self.should_continue,
-            {"continue": "summarizer", "tools": "tools"})
+            {
+                "continue": "summarizer",
+                "tools": "tools"
+            }
+        )
 
         # Set entry and finish points
         # graph_builder.set_entry_point("input_guardrails")
@@ -63,16 +80,27 @@ class AgentGraph:
         graph_builder.set_finish_point("recommender")
 
         # Compile the graph
-        #memory = MemorySaver()
+        # memory = MemorySaver()
         self.agent = graph_builder.compile()  # checkpointer=memory)
 
     def should_continue(self, state: agent_states.State):
         messages = state["messages"]
         last_message = messages[-1]
-        if last_message.tool_calls:
-            print("Calling tools")
+        tool_calls_count = state.get("tool_calls_count", 0)
+
+        # Check if we've reached the maximum number of tool calls
+        if tool_calls_count >= self.MAX_TOOL_CALLS:
+            print(f"\nReached maximum tool calls limit ({self.MAX_TOOL_CALLS}), continuing to summarizer")
+            return "continue"
+
+        # Check for tool_calls directly on the message
+        if isinstance(last_message, AIMessage) and getattr(last_message,
+                                                           'tool_calls', None):
+            print("\nRouting to tools node")
+            print(f"Tool calls: {last_message.tool_calls}")
             return "tools"
-        print("Calling summarizer")
+
+        print("\nNo tool calls found, continuing to summarizer")
         return "continue"
 
     def apply_input_guardrails(
@@ -106,10 +134,12 @@ class AgentGraph:
         return state
 
     def run(self, query) -> list:
-        #config = {"configurable": {"thread_id": "1"}}
-        initial_state = agent_states.State(stock=query,
-                                           messages=[],
-                                           summary=[],
-                                           recommendation=[])
-        response = self.agent.invoke(initial_state)  #, config)
+        initial_state = agent_states.State(
+            stock=query,
+            messages=[],
+            summary=[],
+            recommendation=[],
+            tool_calls_count=0  # Initialize counter
+        )
+        response = self.agent.invoke(initial_state)
         return response["recommendation"][-1]
