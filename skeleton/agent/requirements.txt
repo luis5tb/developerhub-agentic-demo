@@ -1,6 +1,7 @@
 chromadb==0.4.3
 duckduckgo_search
 gradio
+langchain-aws
 langchain-openai
 langchain_community
 langchain_experimental

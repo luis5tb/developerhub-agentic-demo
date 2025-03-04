@@ -1,3 +1,7 @@
+import httpx
+import os
+from enum import Enum
+
 from langgraph.graph.message import add_messages
 
 from langchain_core.messages import AIMessage, ToolMessage
@@ -7,11 +11,11 @@ from langchain_openai import ChatOpenAI
 from langchain.callbacks.streaming_stdout import StreamingStdOutCallbackHandler
 
 # Hyperscalers Retrievers
+from langchain_aws.retrievers import AmazonKnowledgeBasesRetriever
 from langchain_community.retrievers import AzureAISearchRetriever
+from langchain.chains import RetrievalQA
 
 import agent_states
-import httpx
-import os
 import prompts
 
 LLM_ENDPOINT = os.getenv("LLM_ENDPOINT")
@@ -19,9 +23,38 @@ TOKEN = os.getenv("API_KEY")
 MODEL_NAME = os.getenv("MODEL_NAME")
 
 # Hyperscaler VectorDBs
+class SupportedVectorDBProviders(Enum):
+    AMAZON_KNOWLEDGE_BASE = "AmazonKnowledgeBase"
+    AZURE_AI_SEARCH = "AzureAISearch"
+
+# Mapping environment variable values to enum members
+VECTORDB_PROVIDER_MAPPING = {
+    "AWS": SupportedVectorDBProviders.AMAZON_KNOWLEDGE_BASE,
+    "AZURE": SupportedVectorDBProviders.AZURE_AI_SEARCH
+}
+
+VECTORDB_PROVIDER = VECTORDB_PROVIDER_MAPPING.get(os.getenv("VECTORDB_PROVIDER", "AWS"))
+
+# Azure
 AZURE_AI_SEARCH_SERVICE_NAME = os.getenv("AZURE_AI_SEARCH_SERVICE_NAME")
 AZURE_AI_SEARCH_API_KEY = os.getenv("AZURE_AI_SEARCH_API_KEY")
 AZURE_AI_INDEX_NAME = os.getenv("AZURE_AI_INDEX_NAME")
+
+# AWS
+AWS_KNOWLEDGE_BASE_ID = os.getenv("AWS_KNOWLEDGE_BASE_ID")
+AWS_REGION_NAME = os.getenv("AWS_REGION_NAME")
+
+
+def get_retriever(vectordb_provider):
+    if vectordb_provider == "AmazonKnowledgeBase":
+        return AmazonKnowledgeBasesRetriever(
+            knowledge_base_id=AWS_KNOWLEDGE_BASE_ID,
+            region_name=AWS_REGION_NAME,
+            retrieval_config={
+                "vectorSearchConfiguration": {"numberOfResults": 4}},)
+    elif vectordb_provider == "AzureAISearch":
+        return AzureAISearchRetriever(
+            content_key="content", top_k=1, index_name=AZURE_AI_INDEX_NAME)
 
 
 class ResearchAgent:
@@ -105,10 +138,9 @@ class SummarizationAgent:
         def format_docs(docs):
             return "\n\n".join(doc.page_content for doc in docs)
 
-        self.retriever = AzureAISearchRetriever(
-            content_key="content", top_k=1, index_name=AZURE_AI_INDEX_NAME)
+        self.retriever = get_retriever(VECTORDB_PROVIDER.value)
 
-        summary_prompt = ChatPromptTemplate.from_messages([
+        self.summary_prompt = ChatPromptTemplate.from_messages([
             ("system", prompts.system_prompt),
             ("user", prompts.summary_prompt),
             ])
@@ -117,10 +149,11 @@ class SummarizationAgent:
             {"context": self.retriever | format_docs,
              "messages": RunnablePassthrough(),
              "stock": RunnablePassthrough(),
-            }
-            | summary_prompt
-            | self.llm
-        )
+             }
+             | self.summary_prompt
+             | self.llm
+            )
+
 
     def __call__(self, state: agent_states.State) -> agent_states.State:
         print("Running Summarizer:")
@@ -128,7 +161,10 @@ class SummarizationAgent:
             "stock": state["stock"],
             "messages": state.get("messages", []),
         }
-        response = self.agent.invoke([message])
+        if VECTORDB_PROVIDER.value == "AmazonKnowledgeBase":
+            response = self.agent.invoke(str(message))
+        elif VECTORDB_PROVIDER.value == "AzureAISearch":
+            response = self.agent.invoke([message])
         summaries = state.get("summary", [])
         return {
                 "summary": add_messages(summaries, [response]),

@@ -8,8 +8,8 @@ metadata:
     - redhat-ai
     - agentic-ai
     - responsible-ai
-    - ai-safety
-    - hybrid-cloud
+    - amazon-knowledge-base
+    - azure-ai-search
     - langgraph
 spec:
   owner: luis5tb
