@@ -1,10 +1,20 @@
+import os
 from typing import Annotated
 
 from langchain_core.tools import tool
-
 from langchain_community.tools import DuckDuckGoSearchRun
 from langchain_experimental.utilities import PythonREPL
+from tavily import TavilyClient
 
+# Get Tavily API key from environment variable
+TAVILY_API_KEY = os.getenv("TAVILY_API_KEY")
+
+@tool
+def tavily_search(query: str) -> str:
+    """Use Tavily Search to get information from the internet."""
+    client = TavilyClient(api_key=TAVILY_API_KEY)
+    search_result = client.search(query=query)
+    return str(search_result)
 
 @tool
 def python_repl(code: Annotated[
@@ -25,10 +35,14 @@ def python_repl(code: Annotated[
         result_str + "\n\nIf you have completed all tasks, respond with FINAL ANSWER."
     )
 
-
+# Initialize search tools
 duckduckgo_search = DuckDuckGoSearchRun()
 
-
-def get_tools():
-    # return [python_repl, duckduckgo_search]
-    return [duckduckgo_search]
+def get_tools(search_provider="duckduckgo"):
+    """Get the tools based on the specified search provider."""
+    if search_provider.lower() == "tavily":
+        if not TAVILY_API_KEY:
+            raise ValueError("Tavily API key not found in environment variables")
+        return [tavily_search]
+    else:  # default to duckduckgo
+        return [duckduckgo_search]
