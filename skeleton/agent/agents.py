@@ -110,7 +110,11 @@ class ResearchAgent:
         if isinstance(response, ToolMessage):
             result = response
         else:
-            result = AIMessage(**response.model_dump(exclude={"type", "name"}))
+            if isinstance(response, AIMessage):
+                result = response
+            else:
+                # If response is a dict or has dict-like structure
+                result = AIMessage(content=response.content if hasattr(response, 'content') else response)
 
         messages = state.get("messages", [])
         return {
