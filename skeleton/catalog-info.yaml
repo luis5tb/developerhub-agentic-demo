@@ -13,11 +13,12 @@ metadata:
     github.com/project-slug: ${{values.githubOrg}}/${{values.repoName}}
     tekton.dev/cicd : "true"
   tags:
-    - python
-    - genai
-    - datascience
+    - redhat-ai
+    - agentic-ai
+    - responsible-ai
+    - amazon-knowledge-base
+    - azure-ai-search
     - langgraph
-    - hyperscalers
   links:
     - url: https://console-openshift-console${{values.cluster_id}}/dev-pipelines/ns/${{values.namespace}}/
       title: Pipelines
