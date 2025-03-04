@@ -20,11 +20,9 @@ When external data is needed, output a **structured tool call** instead of a nat
 Strictly follow these guidelines before responding.
 
 ### **Task Information:**
-{stock}
+- **Stock:** {stock}
+- **Messages:** {messages}
 """
-
-# - **Stock:** {stock}
-# - **Feedback (if any):** {feedback}
 
 llamastack_researcher_prompt = """You are a research assistant specializing in financial data retrieval.
     Your primary responsibility is to **use the provided tools** to fetch updated and relevant financial data **before responding**.
@@ -59,11 +57,11 @@ Provide a **concise and structured summary** (max 400 words) covering:
 - **Avoid generic statements**; focus on specifics relevant to {messages}.
 
 ### **Available Data:**
-- **Query:** {messages}
+- **Context Data:** {context}
+- **Previos messages:** {messages}
+- **Query:** {stock}
 
 Provide the summary in a **structured format** for readability."""
-
-# - **Context Data:** {context}
 
 llamastack_summary_prompt = """You are a financial analyst tasked with summarizing key financial insights for {stock}.
 

@@ -62,12 +62,24 @@ $  ./pattern.sh make load-secrets
 $ cat values-secret.yaml.template
   - name: vectordb-keys
     fields:
+    - name: VECTORDB_PROVIDER
+      value: AZURE
     - name: AZURE_AI_SEARCH_SERVICE_NAME
       value: XXXX
     - name: AZURE_AI_SEARCH_API_KEY
       value: XXXX
     - name: AZURE_AI_INDEX_NAME
       value: XXXX
+# If you want to use AWS VectorDB (KnowledgeBase), then you would need to add
+$ cat values-secret.yaml.template
+  - name: vectordb-keys
+    fields:
+    - name: VECTORDB_PROVIDER
+      value: AWS
+    - name: AWS_KNOWLEDGE_BASE_ID
+      value: XXXX
+    - name: AWS_REGION_NAME
+      value: eu-west-1
 $  cp values-secret.yaml.template ~/.config/hybrid-cloud-patterns/values-secret-multicloud-gitops.yaml
 $  ./pattern.sh make load-secrets
 ```

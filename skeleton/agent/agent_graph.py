@@ -24,26 +24,12 @@ class AgentGraph:
             llm_endpoint (str): URL of the deployed vLLM endpoint.
             llm_token (str): Authorization token for the vLLM endpoint.
         """
-        # self.vector_db = VectorDB()
-
         tools = get_tools()
         self.tools_node = ToolNode(tools)
 
-        self.researcher_node = agents.ResearchAgent(
-            llm_endpoint=llm_endpoint,
-            llm_token=llm_token,
-            model_name=model_name,
-            tools=tools)
-
-        self.summarization_node = agents.SummarizationAgent(
-            llm_endpoint=llm_endpoint,
-            llm_token=llm_token,
-            model_name=model_name)
-
-        self.recommender_node = agents.RecommendationAgent(
-            llm_endpoint=llm_endpoint,
-            llm_token=llm_token,
-            model_name=model_name)
+        self.researcher_node = agents.ResearchAgent(tools=tools)
+        self.summarization_node = agents.SummarizationAgent()
+        self.recommender_node = agents.RecommendationAgent()
 
         # Build the graph
         graph_builder = StateGraph(agent_states.State)
@@ -54,8 +40,6 @@ class AgentGraph:
         # Add nodes to the graph
         # graph_builder.add_node("input_guardrails",
         #                        self.apply_input_guardrails)
-        # graph_builder.add_node("context_retrieval",
-        #                        self.retrieve_context)
         graph_builder.add_node("researcher", self.researcher_node)
         graph_builder.add_node("tools", self.tools_node)
         graph_builder.add_node("summarizer", self.summarization_node)
@@ -66,9 +50,6 @@ class AgentGraph:
 
         # Define transitions between nodes
         graph_builder.add_edge("tools", "researcher")
-        # graph_builder.add_edge("input_guardrails", "context_retrieval")
-        # graph_builder.add_edge("context_retrieval", "llm")
-        # graph_builder.add_edge("llm", "output_guardrails")
         graph_builder.add_edge("summarizer", "recommender")
 
         # graph_builder.add_conditional_edges("researcher", tools_condition)
@@ -123,22 +104,6 @@ class AgentGraph:
         """
         state["messages"] = [apply_guardrails(msg)
                              for msg in state["messages"]]
-        return state
-
-    def retrieve_context(
-            self, state: agent_states.State) -> agent_states.State:
-        """
-        Retrieve context from the vector database.
-
-        Args:
-            state (State): State containing the messages.
-
-        Returns:
-            State: Updated state with retrieved context added to messages.
-        """
-        query = state["messages"][-1]  # Use the last message as the query
-        context = self.vector_db.retrieve_context(query)
-        state["messages"] = add_messages(state["messages"], [context])
         return state
 
     def run(self, query) -> list:

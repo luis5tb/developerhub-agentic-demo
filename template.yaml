@@ -8,9 +8,10 @@ metadata:
     - redhati-ai
     - agentic-ai
     - responsible-ai
-    - ai-safety
+    - amazon-knowledge-base
+    - azure-ai-search
+    - langgraph
     - llamastack
-    - hybrid-cloud
 spec:
   owner: luis5tb
   type: service
