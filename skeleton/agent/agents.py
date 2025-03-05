@@ -45,6 +45,8 @@ AZURE_AI_INDEX_NAME = os.getenv("AZURE_AI_INDEX_NAME")
 # AWS
 AWS_KNOWLEDGE_BASE_ID = os.getenv("AWS_KNOWLEDGE_BASE_ID")
 AWS_REGION_NAME = os.getenv("AWS_REGION_NAME")
+# AWS credentials should be provided through environment variables:
+# AWS_ACCESS_KEY_ID and AWS_SECRET_ACCESS_KEY
 
 
 def get_retriever(vectordb_provider):

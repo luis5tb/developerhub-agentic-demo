@@ -79,6 +79,10 @@ $ cat values-secret.yaml.template
       value: XXXX
     - name: AWS_REGION_NAME
       value: eu-west-1
+    - name: AWS_ACCESS_KEY_ID
+      value: XXXX
+    - name: AWS_SECRET_ACCESS_KEY
+      value: XXXX
 $  cp values-secret.yaml.template ~/.config/hybrid-cloud-patterns/values-secret-multicloud-gitops.yaml
 $  ./pattern.sh make load-secrets
 ```
