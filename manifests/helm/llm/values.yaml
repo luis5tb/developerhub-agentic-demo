@@ -27,3 +27,6 @@ bucketSecret: ${{values.bucket}}
 
 backstageLabels:
   backstage.io/kubernetes-id: ${{values.component_id}}
+
+jobImage: image-registry.openshift-image-registry.svc:5000/redhat-ods-applications/s2i-generic-data-science-notebook:2024.1
+initContainerImage: registry.redhat.io/ubi9/python-311  # alpine/git:2.43.0

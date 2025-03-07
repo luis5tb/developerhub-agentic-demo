@@ -47,6 +47,12 @@ $ cat values-secret.yaml.template
       value: XXXX
     - name: webhook_secret
       value: XXXX
+
+  # HuggingFace token (when using HF and S3 instead of OCI for model storage)
+  - name: huggingface-keys
+    fields:
+    - name: hf_token
+      value: XXXX
 $ cp values-secret.yaml.template ~/.config/hybrid-cloud-patterns/values-secret-multicloud-gitops.yaml
 
 # And trigger the pattern installation
