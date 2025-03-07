@@ -19,7 +19,7 @@ spec:
     spec:
       containers:
         - name: upload-model-to-s3
-          image: image-registry.openshift-image-registry.svc:5000/redhat-ods-applications/s2i-generic-data-science-notebook:2024.1
+          image: {{ $.Values.jobImage }}
           imagePullPolicy: IfNotPresent
           envFrom:
             - secretRef:
@@ -88,18 +88,35 @@ spec:
               mountPath: /opt/app-root/src
       initContainers:
         - name: git-cloner
-          image: alpine/git:2.43.0
+          image:  {{ $.Values.initContainerImage }}
           env:
             - name: MODEL_NAME
               value: '{{ $.Values.modelName }}'
             - name: REPO_URL
               value: https://huggingface.co/'{{ $.Values.s3.hf_path }}'.git
+            - name: HF_TOKEN
+              valueFrom:
+                secretKeyRef:
+                  name: huggingface-secret
+                  key: hf_token
           command:
             - /bin/sh
             - -c
             - -e
-            - git clone --single-branch -- $(REPO_URL) /opt/app-root/src/models/$(MODEL_NAME)
-            - ls -laFh /opt/app-root/src/models/$(MODEL_NAME)
+            - |
+              pip install --no-cache-dir huggingface_hub
+              python -c "
+              import os
+              from huggingface_hub import login, snapshot_download
+
+              hf_token = os.getenv('HF_TOKEN')
+              model_repo = os.getenv('REPO_URL')
+              model_path = f'/opt/app-root/src/models/{os.getenv("MODEL_NAME")}'
+
+              login(token=hf_token)
+              snapshot_download(repo_id=model_repo, local_dir=model_path)
+              "
+              ls -laFh /opt/app-root/src/models/$(MODEL_NAME)
           volumeMounts:
             - mountPath: /opt/app-root/src/
               name: src
