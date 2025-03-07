@@ -38,6 +38,10 @@ spec:
       runtime: vllm
       {{- if $.Values.uri }}
       storageUri: {{ $.Values.uri }}
+      {{- if $.Values.oci_secret }}
+      imagePullSecrets:
+      - name: {{ $.Values.oci_secret }}
+      {{- end }}
       {{- else if $.Values.s3.default_endpoint }}
       storage:
         key: aws-connection-{{ $.Values.bucketSecret }}

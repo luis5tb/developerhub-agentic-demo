@@ -103,6 +103,10 @@ spec:
           title: OCI URI
           type: string
           description: OCI URI for model container image
+        oci_secret:
+          title: Registry Secret
+          type: string
+          description: Secret name containing the registry auth credentials
     - title: Provide Build Information
       required:
         - image_host
@@ -174,6 +178,7 @@ spec:
           s3_endpoint: ${{parameters.s3_endpoint}}
           bucket: ${{parameters.bucket}}
           oci_uri: ${{parameters.oci_uri}}
+          oci_secret: ${{parameters.oci_secret}}
         targetPath: ./tenant-gitops
     - id: publishGitops
       name: Publishing to Deployment Resource Repository

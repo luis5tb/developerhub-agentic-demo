@@ -22,6 +22,7 @@ s3:
   hf_path: ${{values.hf_path}}
 
 uri: ${{values.oci_uri}}
+oci_secret: ${{values.oci_secret}}
 
 bucketSecret: ${{values.bucket}}
 
