@@ -1,0 +1,21 @@
+apiVersion: tekton.dev/v1beta1
+kind: Task
+metadata:
+  name: restart-deployment
+  namespace: {{ $.Values.namespace}}
+spec:
+  params:
+    - name: deployment-name
+      type: string
+  steps:
+    - name: restart
+      image: registry.access.redhat.com/ubi9/ubi:latest
+      script: |
+        #!/bin/sh
+
+        curl -LO https://dl.k8s.io/release/v1.24.0/bin/linux/amd64/kubectl
+        chmod +x kubectl
+        mv kubectl /usr/local/bin/
+
+        kubectl rollout restart deployment/$(params.deployment-name)
+        echo "Deployment rolled out triggered successfully!"
