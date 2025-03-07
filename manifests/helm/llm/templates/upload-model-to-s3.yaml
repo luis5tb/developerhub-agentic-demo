@@ -93,7 +93,8 @@ spec:
             - name: MODEL_NAME
               value: '{{ $.Values.modelName }}'
             - name: REPO_URL
-              value: https://huggingface.co/'{{ $.Values.s3.hf_path }}'.git
+              #value: https://huggingface.co/{{ $.Values.s3.hf_path }}.git
+              value: '{{ $.Values.s3.hf_path }}'
             - name: HF_TOKEN
               valueFrom:
                 secretKeyRef:
@@ -111,7 +112,8 @@ spec:
 
               hf_token = os.getenv('HF_TOKEN')
               model_repo = os.getenv('REPO_URL')
-              model_path = f'/opt/app-root/src/models/{os.getenv("MODEL_NAME")}'
+              model_name = os.getenv('MODEL_NAME')
+              model_path = f'/opt/app-root/src/models/{model_path}'
 
               login(token=hf_token)
               snapshot_download(repo_id=model_repo, local_dir=model_path)
