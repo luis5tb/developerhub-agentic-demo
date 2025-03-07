@@ -2,6 +2,7 @@ apiVersion: tekton.dev/v1
 kind: PipelineRun
 metadata:
   name: {{ .Values.name }}-pipelinerun
+  namespace: {{ $.Values.namespace}}
   labels:
     backstage.io/kubernetes-id: ${{values.component_id}}
     tekton.dev/pipeline: {{ .Values.name }}-pipeline

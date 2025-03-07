@@ -2,6 +2,7 @@ apiVersion: tekton.dev/v1
 kind: Pipeline
 metadata:
   name: {{ .Values.name }}-pipeline
+  namespace: {{ $.Values.namespace}}
   labels:
     type: pipeline
     backstage.io/kubernetes-id: ${{values.component_id}}
@@ -22,6 +23,10 @@ spec:
     - name: output-image
       description: reference of the image that will get created
       default: {{ .Values.image.url }}
+      type: string
+    - name: deployment-name
+      description: name of the deployment to restart
+      default: {{ .Values.deploymentName }}
       type: string
   tasks:
     - name: git-clone
@@ -62,5 +67,13 @@ spec:
       workspaces:
         - name: source
           workspace: shared-folder
+    - name: restart-deployment
+      params:
+        - name: deployment-name
+          value: $(params.deployment-name)
+      runAfter:
+        - buildah-image
+      taskRef:
+        name: restart-deployment
   workspaces:
     - name: shared-folder
