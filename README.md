@@ -103,6 +103,27 @@ The template will be automatically imported, but you can clone it, modify it and
   - TrustyAI evaluation job at OpenShift AI
   - LlamaStack distribution building and server deploying
 
+### Model deployment
+Note there is 2 ways to deploy the model:
+- Obtaining the model from an OCI registry (recommended)
+- Obtaining the model from HuggingFace and storing it on S3 (Minio) buckets.
+
+#### Using OCI
+The preferred way is using OCI, which will pull the model from the OCI registry.
+
+To use this method, after deploying the templateyou need to create a secret with the OCI credentials in the namespace where the model is deployed. The next command can be use to generate the required secret. Note that the secret name must be the one you stated on the template.
+
+```bash
+$ oc create secret -n vllm-<namespace> docker-registry <pull_secret_name> \
+    --docker-server=<registry_server> \
+    --docker-username=<user_name> \
+    --docker-password=<password> \
+    --docker-email=<email>
+```
+
+#### Using HuggingFace and S3
+In this case, the model will be obtained from HuggingFace and stored on a S3 bucket. To ensure the model can be properly downloaded from HuggingFace, you need to create a secret with the HuggingFace token. This is taken care of by the Validated Patterns, so you don't need to do anything other than adding the token to the values-secret before triggering the pattern installation.
+
 
 ## How to enable RHDH GitHub Authentication (GH Access token, cliend_id and client_secret)
 
