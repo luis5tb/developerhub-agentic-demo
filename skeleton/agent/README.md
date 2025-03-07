@@ -29,7 +29,7 @@ To change the (LangGraph) Agent(s) code, there is 2 options available at Red Hat
 
 ![Red Hat Developer Hub Links](../images/rhdh_links.png)
 
-Pushing changes trigger an automatic pipeline (PipelineRun) to build the new Agent Service image. After the build completes, go to the deployment and manually trigger a redeployment to use the new image.
+Pushing changes trigger an automatic pipeline (PipelineRun) to build the new Agent Service image. After the build completes, the agent deployment gets automatically rolled out with the new image.
 
 ![OpenShift (Tekton) Pipeline](../images/ocp_pipeline.png)
 
