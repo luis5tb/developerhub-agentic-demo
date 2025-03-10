@@ -156,3 +156,5 @@ The recommended way to configure it is available at [Red Hat Developer Hub GitHu
 ## How to build an OCI ModelCar container from HuggingFace
 
 [Build and deploy a ModelCar container in OpenShift AI](https://developers.redhat.com/articles/2025/01/30/build-and-deploy-modelcar-container-openshift-ai#)
+
+There is also a utils folder in this repo which covers how to build your own ModelCar container from HuggingFace, including also HF auth.
