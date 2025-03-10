@@ -113,7 +113,7 @@ spec:
               hf_token = os.getenv('HF_TOKEN')
               model_repo = os.getenv('REPO_URL')
               model_name = os.getenv('MODEL_NAME')
-              model_path = f'/opt/app-root/src/models/{model_path}'
+              model_path = f'/opt/app-root/src/models/{model_name}'
 
               login(token=hf_token)
               snapshot_download(repo_id=model_repo, local_dir=model_path)
