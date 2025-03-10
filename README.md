@@ -6,7 +6,7 @@ https://github.com/luis5tb/multicloud-gitops/tree/rhdh-demo (note the `rhdh-demo
 ```bash
 $ git clone https://github.com/luis5tb/multicloud-gitops
 $ cd multicloud-gitops
-$ git checkout rhdh-demo 
+$ git checkout rhdh-demo
 
 # Adjust secrets as needed
 $ cat values-secret.yaml.template
@@ -95,7 +95,7 @@ $  ./pattern.sh make load-secrets
 
 The template will be automatically imported, but you can clone it, modify it and then import the template into your deployed Red Hat Developer Hub and instantiate it. It will create two repositories in your Git account:
 - git repo with the source code for the agent
-- gitops repo with the resources being created using helm and argocd applications for deploying the demo resources: 
+- gitops repo with the resources being created using helm and argocd applications for deploying the demo resources:
   - Build pipeline for the agent image
   - LLM at OpenShift AI
   - Agent at OpenShift
@@ -154,3 +154,5 @@ The recommended way to configure it is available at [Red Hat Developer Hub GitHu
 ## How to build an OCI ModelCar container from HuggingFace
 
 [Build and deploy a ModelCar container in OpenShift AI](https://developers.redhat.com/articles/2025/01/30/build-and-deploy-modelcar-container-openshift-ai#)
+
+There is also a utils folder in this repo which covers how to build your own ModelCar container from HuggingFace, including also HF auth.
