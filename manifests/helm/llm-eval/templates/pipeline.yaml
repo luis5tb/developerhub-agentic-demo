@@ -54,9 +54,24 @@ spec:
       default: ""
       description: Eval Recipe Template to use (only if task_name not set)
   tasks:
+    - name: create-lmeval-data
+      taskRef:
+        name: create-lmeval-data
+      params:
+        - name: model
+          value: $(params.model)
+        - name: tokenizer
+          value: $(params.tokenizer)
+      workspaces:
+        - name: shared-data
+          workspace: shared-data
+        - name: lmeval-data
+          workspace: lmeval-data
     - name: run-lmeval-job
       taskRef:
         name: lmeval-task
+      runAfter:
+        - create-lmeval-data
       params:
         - name: job_name
           value: $(params.lmevaljob_name)
@@ -71,7 +86,7 @@ spec:
         - name: tokenized_requests
           value: $(params.tokenized_requests)
         - name: tokenizer
-          value: $(params.tokenizer)
+          value: /opt/app-root/src/hf_home/$(params.model)
         - name: tasks_name
           value: ["$(params.tasks_name[*])"]
         - name: task_recipe_card_name
@@ -85,3 +100,13 @@ spec:
           workspace: shared-data
   workspaces:
     - name: shared-data
+      volumeClaimTemplate:
+        spec:
+          accessModes:
+            - ReadWriteOnce
+          resources:
+            requests:
+              storage: 1Gi
+    - name: lmeval-data
+      persistentVolumeClaim:
+        claimName: lmeval-data
