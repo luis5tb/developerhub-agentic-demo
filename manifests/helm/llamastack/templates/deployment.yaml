@@ -61,6 +61,8 @@ spec:
                   key: model_name
             - name: LLAMA_STACK_PORT
               value: "{{ $.Values.service.port }}"
+            - name: CHROMADB_URL
+              value: "{{ $.Values.chromadbUrl }}"
           command: ["python", "-m", "llama_stack.distribution.server.server", "--yaml-config", "/config/run.yaml"]
           volumeMounts:
             - name: run-config

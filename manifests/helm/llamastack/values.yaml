@@ -54,5 +54,6 @@ llamastackRunConfigMap: llamastack-run-cm
 
 pipelineSA: tekton-sa
 
+chromadbUrl: http://chromadb-service.llamastack-${{values.namespace}}.svc.cluster.local:8000
 chromaImage:
   repository: ${{values.image_host}}/llamastack-${{values.namespace}}/chromadb:latest
