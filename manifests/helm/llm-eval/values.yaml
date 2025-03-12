@@ -15,6 +15,10 @@ evalOptions:
   tasksName: [mmlu]
   baseImage: image-registry.openshift-image-registry.svc:5000/openshift/cli:latest
 
+evalPVC:
+  storage: 50Gi
+  accessMode: ReadWriteOnce
+
 secretStore:
   name: vault-backend
   kind: ClusterSecretStore

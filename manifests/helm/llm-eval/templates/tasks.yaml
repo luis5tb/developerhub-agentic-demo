@@ -1,3 +1,61 @@
+---
+apiVersion: tekton.dev/v1beta1
+kind: Task
+metadata:
+  name: create-lmeval-data
+  labels:
+    backstage.io/kubernetes-id: ${{values.component_id}}
+spec:
+  params:
+    - name: model
+      type: string
+    - name: tokenizer
+      type: string
+  workspaces:
+    - name: lmeval-data
+      description: "PVC to store the Hugging Face model"
+  steps:
+    - name: download-model
+      script: |
+        #!/bin/sh
+        set -e
+        MODEL_DIR="/workspace/lmeval-data/$(params.model)"
+        rm -rf $MODEL_DIR
+        MODEL_NAME="$(params.tokenizer)"
+        HF_TOKEN=$(cat /secrets/HF_TOKEN)
+
+        echo "Downloading tokenizer: $MODEL_NAME with authentication using snapshot_download"
+
+        # Ensure Hugging Face CLI and dependencies are installed
+        if ! command -v python3 &> /dev/null; then
+          echo "Installing Python..."
+          dnf install -y python3 python3-pip
+        fi
+
+        pip3 install --no-cache-dir --upgrade huggingface_hub
+
+        python3 - <<EOF
+        import os
+        from huggingface_hub import login, snapshot_download
+
+        hf_token = os.getenv('HF_TOKEN')
+        model_repo = os.getenv('MODEL_NAME')
+        model_path = os.getenv('MODEL_DIR')
+
+        login(token=hf_token)
+        snapshot_download(repo_id=model_repo, local_dir=model_path)
+
+        print(f"Model downloaded to: {model_path}")
+        EOF
+
+        echo "Download complete. Model stored in $MODEL_DIR"
+      env:
+        - name: HF_TOKEN
+          valueFrom:
+            secretKeyRef:
+              name: huggingface-secret
+              key: HF_TOKEN
+---
 apiVersion: tekton.dev/v1
 kind: Task
 metadata:
@@ -102,6 +160,9 @@ spec:
               value: $(params.tokenizer)
             - name: verify_certificate
               value: "{{ $.Values.evalOptions.verifyCertificate }}"
+          offline:
+            storage:
+              pvcName: "lmeval-data"
           pod:
             container:
               env:
