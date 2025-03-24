@@ -13,6 +13,7 @@ from langchain.callbacks.streaming_stdout import StreamingStdOutCallbackHandler
 # Hyperscalers Retrievers
 from langchain_aws.retrievers import AmazonKnowledgeBasesRetriever
 from langchain_community.retrievers import AzureAISearchRetriever
+from langchain_google_community import VertexAISearchRetriever
 
 import agent_states
 import prompts
@@ -26,12 +27,14 @@ MODEL_NAME = os.getenv("MODEL_NAME")
 class SupportedVectorDBProviders(Enum):
     AMAZON_KNOWLEDGE_BASE = "AmazonKnowledgeBase"
     AZURE_AI_SEARCH = "AzureAISearch"
+    GOOGLE_VERTEX_AI_SEARCH = "GoogleVertexAISearch"
 
 
 # Mapping environment variable values to enum members
 VECTORDB_PROVIDER_MAPPING = {
     "AWS": SupportedVectorDBProviders.AMAZON_KNOWLEDGE_BASE,
-    "AZURE": SupportedVectorDBProviders.AZURE_AI_SEARCH
+    "AZURE": SupportedVectorDBProviders.AZURE_AI_SEARCH,
+    "GOOGLE": SupportedVectorDBProviders.GOOGLE_VERTEX_AI_SEARCH
 }
 
 VECTORDB_PROVIDER = VECTORDB_PROVIDER_MAPPING.get(
@@ -48,6 +51,12 @@ AWS_REGION_NAME = os.getenv("AWS_REGION_NAME")
 # AWS credentials should be provided through environment variables:
 # AWS_ACCESS_KEY_ID and AWS_SECRET_ACCESS_KEY
 
+# Google
+# GOOGLE_APPLICATION_CREDENTIALS shuld be provided through environment variables
+GOOGLE_PROJECT_ID = os.getenv("GOOGLE_PROJECT_ID")
+GOOGLE_LOCATION_ID = os.getenv("GOOGLE_LOCATION_ID")
+GOOGLE_DATA_STORE_ID = os.getenv("GOOGLE_DATA_STORE_ID")
+
 
 def get_retriever(vectordb_provider):
     if vectordb_provider == "AmazonKnowledgeBase":
@@ -59,6 +68,13 @@ def get_retriever(vectordb_provider):
     elif vectordb_provider == "AzureAISearch":
         return AzureAISearchRetriever(
             content_key="content", top_k=1, index_name=AZURE_AI_INDEX_NAME)
+    elif vectordb_provider == "GoogleVertexAISearch":
+        return VertexAISearchRetriever(
+            project_id=GOOGLE_PROJECT_ID,
+            data_store_id=GOOGLE_DATA_STORE_ID,
+            location_id=GOOGLE_LOCATION_ID,
+            max_documents=3
+        )
 
 
 class ResearchAgent:
@@ -202,6 +218,8 @@ class SummarizationAgent:
         if VECTORDB_PROVIDER.value == "AmazonKnowledgeBase":
             response = self.agent.invoke(str(message))
         elif VECTORDB_PROVIDER.value == "AzureAISearch":
+            response = self.agent.invoke([message])
+        elif VECTORDB_PROVIDER.value == "GoogleVertexAISearch":
             response = self.agent.invoke([message])
         summaries = state.get("summary", [])
         return {

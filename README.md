@@ -59,8 +59,8 @@ $ cp values-secret.yaml.template ~/.config/hybrid-cloud-patterns/values-secret-m
 $ ./pattern.sh make install
 
 # If you need to regenerate/update the secrets, just update values-secret.yaml.template and load them
-$  cp values-secret.yaml.template ~/.config/hybrid-cloud-patterns/values-secret-multicloud-gitops.yaml
-$  ./pattern.sh make load-secrets
+$ cp values-secret.yaml.template ~/.config/hybrid-cloud-patterns/values-secret-multicloud-gitops.yaml
+$ ./pattern.sh make load-secrets
 
 # To use VectorDB from Azure, add the next keys and re-load the secrets
 # (or have them before triggering the make install)
@@ -89,8 +89,22 @@ $ cat values-secret.yaml.template
       value: XXXX
     - name: AWS_SECRET_ACCESS_KEY
       value: XXXX
-$  cp values-secret.yaml.template ~/.config/hybrid-cloud-patterns/values-secret-multicloud-gitops.yaml
-$  ./pattern.sh make load-secrets
+# If you want to use Google Vertex AI Search, then you would need to point to the Google application credential file (API Key for the Service Account)
+$ cat values-secret.yaml.template
+  - name: vectordb-keys
+    fields:
+    - name: VECTORDB_PROVIDER
+      value: GOOGLE
+    - name: GOOGLE_API_KEY
+      value: YOUR_GOOGLE_API_KEY.json
+    - name: GOOGLE_PROJECT_ID
+      value: XXX
+    - name: GOOGLE_LOCATION_ID
+      value: "global"
+    - name: GOOGLE_DATA_STORE_ID
+      value: XXXX
+$ cp values-secret.yaml.template ~/.config/hybrid-cloud-patterns/values-secret-multicloud-gitops.yaml
+$ ./pattern.sh make load-secrets
 ```
 
 The template will be automatically imported, but you can clone it, modify it and then import the template into your deployed Red Hat Developer Hub and instantiate it. It will create two repositories in your Git account:

@@ -43,6 +43,9 @@ spec:
               protocol: TCP
           image: "{{ $.Values.image.repository }}:{{ $.Values.image.tag | default .Chart.AppVersion }}"
           imagePullPolicy: {{ $.Values.image.pullPolicy }}
+          volumeMounts:
+          - name: google-cloud-key
+            mountPath: /var/secrets/google
           env:
             - name: LLM_ENDPOINT
               valueFrom:
@@ -60,9 +63,15 @@ spec:
                   name: llm-sa-secret
                   key: model_name
               #value: {{ $.Values.modelName }}
+            - name: GOOGLE_APPLICATION_CREDENTIALS
+              value: /var/secrets/google/api_key.json
           envFrom:
             - secretRef:
                 name: vectordb
+      volumes:
+      - name: google-cloud-key
+        secret:
+          secretName: vectordb-google
       {{- with $.Values.nodeSelector }}
       nodeSelector:
         {{- toYaml . | nindent 8 }}
