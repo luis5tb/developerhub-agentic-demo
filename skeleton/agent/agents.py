@@ -220,7 +220,7 @@ class SummarizationAgent:
         elif VECTORDB_PROVIDER.value == "AzureAISearch":
             response = self.agent.invoke([message])
         elif VECTORDB_PROVIDER.value == "GoogleVertexAISearch":
-            response = self.agent.invoke([message])
+            response = self.agent.invoke(str(message))
         summaries = state.get("summary", [])
         return {
                 "summary": add_messages(summaries, [response]),
