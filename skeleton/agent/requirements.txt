@@ -5,7 +5,7 @@ langchain-aws
 langchain-openai
 langchain_community
 langchain_experimental
-langchain-google-community
+langchain-google-community[vertexaisearch]
 langchain-google-vertexai
 langgraph
 openai
